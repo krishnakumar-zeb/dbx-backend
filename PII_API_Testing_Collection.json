@@ -1,0 +1,4357 @@
+{
+  "info": {
+    "name": "PII Anonymization API - Complete Test Suite",
+    "description": "Comprehensive test collection for PII API covering all regions (AMER, APJ, EMEA) and all file formats (PDF, DOCX, DOC, TXT, CSV, XLSX)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "pii-api-test-suite-v1"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/v1",
+      "type": "string"
+    },
+    {
+      "key": "assessment_id",
+      "value": "a3097aef-06db-4568-a619-194e5b8c7d21",
+      "type": "string",
+      "description": "UUID of the assessment - update this with a valid assessment ID from your database"
+    },
+    {
+      "key": "caller_name",
+      "value": "postman-test-suite",
+      "type": "string"
+    },
+    {
+      "key": "documents_path",
+      "value": "c:\\\\Users\\\\KishorePonnurangam\\\\generated_documents",
+      "type": "string",
+      "description": "Base path to generated documents folder"
+    },
+    {
+      "key": "prospect_id",
+      "value": "b4097aef-06db-4568-a619-194e5b8c7d22",
+      "type": "string",
+      "description": "UUID of the prospect - update this with a valid prospect ID from your database"
+    }
+  ],
+  "item": [
+    {
+      "name": "AMER Region Tests",
+      "description": "Test cases for all countries in AMER region",
+      "item": [
+        {
+          "name": "Canada Tests",
+          "description": "Test all file formats for Canada",
+          "item": [
+            {
+              "name": "Canada - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Canada\\\\AMER_Canada.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Canada using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "Canada - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Canada\\\\AMER_Canada.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Canada using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "Canada - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Canada\\\\AMER_Canada.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Canada using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "Canada - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Canada\\\\AMER_Canada.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Canada using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "Canada - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Canada\\\\AMER_Canada.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Canada using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "Canada - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Canada\\\\AMER_Canada.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Canada using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Mexico Tests",
+          "description": "Test all file formats for Mexico",
+          "item": [
+            {
+              "name": "Mexico - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Mexico\\\\AMER_Mexico.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Mexico using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "Mexico - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Mexico\\\\AMER_Mexico.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Mexico using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "Mexico - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Mexico\\\\AMER_Mexico.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Mexico using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "Mexico - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Mexico\\\\AMER_Mexico.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Mexico using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "Mexico - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Mexico\\\\AMER_Mexico.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Mexico using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "Mexico - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\Mexico\\\\AMER_Mexico.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Mexico using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "US Tests",
+          "description": "Test all file formats for US",
+          "item": [
+            {
+              "name": "US - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\US\\\\AMER_US.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for US using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "US - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\US\\\\AMER_US.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for US using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "US - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\US\\\\AMER_US.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for US using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "US - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\US\\\\AMER_US.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for US using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "US - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\US\\\\AMER_US.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for US using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "US - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\AMER\\\\US\\\\AMER_US.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for US using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "APJ Region Tests",
+      "description": "Test cases for all countries in APJ region",
+      "item": [
+        {
+          "name": "Australia Tests",
+          "description": "Test all file formats for Australia",
+          "item": [
+            {
+              "name": "Australia - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Australia\\\\APJ_Australia.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Australia using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "Australia - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Australia\\\\APJ_Australia.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Australia using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "Australia - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Australia\\\\APJ_Australia.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Australia using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "Australia - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Australia\\\\APJ_Australia.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Australia using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "Australia - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Australia\\\\APJ_Australia.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Australia using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "Australia - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Australia\\\\APJ_Australia.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Australia using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "India Tests",
+          "description": "Test all file formats for India",
+          "item": [
+            {
+              "name": "India - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\India\\\\APJ_India.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for India using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "India - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\India\\\\APJ_India.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for India using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "India - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\India\\\\APJ_India.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for India using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "India - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\India\\\\APJ_India.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for India using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "India - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\India\\\\APJ_India.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for India using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "India - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\India\\\\APJ_India.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for India using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Japan Tests",
+          "description": "Test all file formats for Japan",
+          "item": [
+            {
+              "name": "Japan - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Japan\\\\APJ_Japan.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Japan using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "Japan - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Japan\\\\APJ_Japan.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Japan using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "Japan - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Japan\\\\APJ_Japan.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Japan using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "Japan - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Japan\\\\APJ_Japan.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Japan using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "Japan - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Japan\\\\APJ_Japan.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Japan using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "Japan - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Japan\\\\APJ_Japan.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Japan using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Malaysia Tests",
+          "description": "Test all file formats for Malaysia",
+          "item": [
+            {
+              "name": "Malaysia - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Malaysia\\\\APJ_Malaysia.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Malaysia using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "Malaysia - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Malaysia\\\\APJ_Malaysia.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Malaysia using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "Malaysia - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Malaysia\\\\APJ_Malaysia.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Malaysia using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "Malaysia - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Malaysia\\\\APJ_Malaysia.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Malaysia using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "Malaysia - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Malaysia\\\\APJ_Malaysia.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Malaysia using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "Malaysia - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Malaysia\\\\APJ_Malaysia.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Malaysia using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Singapore Tests",
+          "description": "Test all file formats for Singapore",
+          "item": [
+            {
+              "name": "Singapore - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Singapore\\\\APJ_Singapore.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Singapore using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "Singapore - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Singapore\\\\APJ_Singapore.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Singapore using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "Singapore - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Singapore\\\\APJ_Singapore.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Singapore using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "Singapore - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Singapore\\\\APJ_Singapore.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Singapore using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "Singapore - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Singapore\\\\APJ_Singapore.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Singapore using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "Singapore - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\APJ\\\\Singapore\\\\APJ_Singapore.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Singapore using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EMEA Region Tests",
+      "description": "Test cases for all countries in EMEA region",
+      "item": [
+        {
+          "name": "France Tests",
+          "description": "Test all file formats for France",
+          "item": [
+            {
+              "name": "France - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\France\\\\EMEA_France.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for France using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "France - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\France\\\\EMEA_France.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for France using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "France - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\France\\\\EMEA_France.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for France using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "France - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\France\\\\EMEA_France.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for France using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "France - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\France\\\\EMEA_France.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for France using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "France - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\France\\\\EMEA_France.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for France using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Germany Tests",
+          "description": "Test all file formats for Germany",
+          "item": [
+            {
+              "name": "Germany - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Germany\\\\EMEA_Germany.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Germany using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "Germany - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Germany\\\\EMEA_Germany.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Germany using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "Germany - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Germany\\\\EMEA_Germany.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Germany using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "Germany - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Germany\\\\EMEA_Germany.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Germany using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "Germany - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Germany\\\\EMEA_Germany.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Germany using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "Germany - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Germany\\\\EMEA_Germany.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Germany using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Saudi Tests",
+          "description": "Test all file formats for Saudi",
+          "item": [
+            {
+              "name": "Saudi - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Saudi\\\\EMEA_Saudi.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Saudi using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "Saudi - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Saudi\\\\EMEA_Saudi.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Saudi using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "Saudi - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Saudi\\\\EMEA_Saudi.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Saudi using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "Saudi - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Saudi\\\\EMEA_Saudi.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Saudi using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "Saudi - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Saudi\\\\EMEA_Saudi.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Saudi using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "Saudi - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\Saudi\\\\EMEA_Saudi.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for Saudi using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "South_Africa Tests",
+          "description": "Test all file formats for South_Africa",
+          "item": [
+            {
+              "name": "South_Africa - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\South_Africa\\\\EMEA_South_Africa.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for South_Africa using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "South_Africa - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\South_Africa\\\\EMEA_South_Africa.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for South_Africa using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "South_Africa - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\South_Africa\\\\EMEA_South_Africa.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for South_Africa using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "South_Africa - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\South_Africa\\\\EMEA_South_Africa.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for South_Africa using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "South_Africa - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\South_Africa\\\\EMEA_South_Africa.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for South_Africa using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "South_Africa - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\South_Africa\\\\EMEA_South_Africa.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for South_Africa using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "UAE Tests",
+          "description": "Test all file formats for UAE",
+          "item": [
+            {
+              "name": "UAE - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UAE\\\\EMEA_UAE.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UAE using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "UAE - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UAE\\\\EMEA_UAE.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UAE using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "UAE - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UAE\\\\EMEA_UAE.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UAE using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "UAE - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UAE\\\\EMEA_UAE.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UAE using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "UAE - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UAE\\\\EMEA_UAE.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UAE using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "UAE - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UAE\\\\EMEA_UAE.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UAE using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "UK Tests",
+          "description": "Test all file formats for UK",
+          "item": [
+            {
+              "name": "UK - PDF",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "pdf",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UK\\\\EMEA_UK.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UK using PDF format"
+              },
+              "response": []
+            },
+            {
+              "name": "UK - DOCX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UK\\\\EMEA_UK.docx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UK using DOCX format"
+              },
+              "response": []
+            },
+            {
+              "name": "UK - DOC",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "docx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UK\\\\EMEA_UK.doc"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UK using DOC format"
+              },
+              "response": []
+            },
+            {
+              "name": "UK - TXT",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "txt",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UK\\\\EMEA_UK.txt"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UK using TXT format"
+              },
+              "response": []
+            },
+            {
+              "name": "UK - CSV",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "csv",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UK\\\\EMEA_UK.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UK using CSV format"
+              },
+              "response": []
+            },
+            {
+              "name": "UK - XLSX",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "assessment_id",
+                      "value": "{{assessment_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "prospect_id",
+                      "value": "{{prospect_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "caller_name",
+                      "value": "{{caller_name}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "input_type",
+                      "value": "xlsx",
+                      "type": "text"
+                    },
+                    {
+                      "key": "document",
+                      "type": "file",
+                      "src": "{{documents_path}}\\\\EMEA\\\\UK\\\\EMEA_UK.xlsx"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/handle-pii",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "handle-pii"
+                  ]
+                },
+                "description": "Test PII anonymization for UK using XLSX format"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Error Handling Tests",
+      "description": "Test cases for error scenarios",
+      "item": [
+        {
+          "name": "Missing Assessment ID",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "caller_name",
+                  "value": "{{caller_name}}",
+                  "type": "text"
+                },
+                {
+                  "key": "input_type",
+                  "value": "pdf",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": "{{documents_path}}\\\\AMER\\\\Canada\\\\AMER_Canada.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/handle-pii",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "handle-pii"
+              ]
+            },
+            "description": "Test missing required parameter - should return 400"
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid UUID Format",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "assessment_id",
+                  "value": "invalid-uuid-format",
+                  "type": "text"
+                },
+                {
+                  "key": "prospect_id",
+                  "value": "{{prospect_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "caller_name",
+                  "value": "{{caller_name}}",
+                  "type": "text"
+                },
+                {
+                  "key": "input_type",
+                  "value": "pdf",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": "{{documents_path}}\\\\AMER\\\\Canada\\\\AMER_Canada.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/handle-pii",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "handle-pii"
+              ]
+            },
+            "description": "Test invalid UUID format - should return 400"
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Input Type",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "assessment_id",
+                  "value": "{{assessment_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "prospect_id",
+                  "value": "{{prospect_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "caller_name",
+                  "value": "{{caller_name}}",
+                  "type": "text"
+                },
+                {
+                  "key": "input_type",
+                  "value": "invalid_type",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": "{{documents_path}}\\\\AMER\\\\Canada\\\\AMER_Canada.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/handle-pii",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "handle-pii"
+              ]
+            },
+            "description": "Test invalid input_type - should return 400"
+          },
+          "response": []
+        },
+        {
+          "name": "Missing File",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "assessment_id",
+                  "value": "{{assessment_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "prospect_id",
+                  "value": "{{prospect_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "caller_name",
+                  "value": "{{caller_name}}",
+                  "type": "text"
+                },
+                {
+                  "key": "input_type",
+                  "value": "pdf",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/handle-pii",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "handle-pii"
+              ]
+            },
+            "description": "Test missing file - should return 400"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

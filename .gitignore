@@ -1,0 +1,57 @@
+# Ignore everything by default
+*
+
+# But include these folders
+!Development/
+!Development/**
+!Presdio/
+!Presdio/**
+
+# Include important documentation files
+!.gitignore
+!README.md
+!CSV_MIGRATION_COMPLETE.md
+!CSV_TO_DATABASE_ROLLBACK_GUIDE.md
+!MIGRATION_SUMMARY.md
+!QUICK_START_CSV_MODE.md
+!TESTING_CHECKLIST.md
+!WINDOWS_TEMP_FIX.md
+!PII_API_Testing_Collection.json
+!requirements.txt
+
+# Exclude sensitive files in Development folder
+Development/.env
+Development/**/.env
+Development/data/*.csv
+Development/**/__pycache__/
+Development/**/*.pyc
+Development/**/*.pyo
+Development/**/*.pyd
+Development/**/.Python
+Development/**/env/
+Development/**/venv/
+Development/**/ENV/
+
+# Exclude Presdio data files
+Presdio/**/*.pdf
+Presdio/**/*.txt
+Presdio/**/*.csv
+Presdio/**/__pycache__/
+Presdio/**/*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temp files
+*.tmp
+*.temp
+*.log
