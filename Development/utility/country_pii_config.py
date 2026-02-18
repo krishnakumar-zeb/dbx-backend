@@ -1,14 +1,17 @@
 """
 Country-specific PII configuration.
-Maps each supported country to its 14 PII entity types with regex patterns
-and Presidio entity mappings based on the PII_Define_Documentation.xlsx.
-"""
-import re
-from typing import Dict, List, Tuple
+Maps each supported country to its PII entity types (11 common + 5 country-specific = 16 total).
+All entity detection is handled by Presidio's built-in and custom recognizers.
 
-# ============================================================
-# SUPPORTED COUNTRIES
-# ============================================================
+Common Entities (11): PERSON, EMAIL_ADDRESS, PHONE_NUMBER, LOCATION, AGE, GENDER,
+                      ETHNICITY, IP_ADDRESS, COOKIE, CERTIFICATE_NUMBER, ZIP_CODE
+Country-Specific (5): Varies by country (e.g., US_SSN, CA_SIN, etc.)
+
+Note: Regex patterns and recognition logic are defined in Presidio recognizer classes,
+not in this config file. This file only defines which entities to look for per country.
+"""
+from typing import Dict, List
+
 SUPPORTED_COUNTRIES = [
     "Canada", "Mexico", "United States", "United Kingdom",
     "Germany", "France", "UAE", "Saudi Arabia",
@@ -19,186 +22,108 @@ SUPPORTED_COUNTRIES = [
 DEFAULT_COUNTRY = "United States"
 
 # ============================================================
-# COUNTRY -> PRESIDIO ENTITY LIST  (14 per country)
+# ENTITY LISTS PER COUNTRY (14 per country)
 # ============================================================
-# These are the Presidio built-in + custom entity names we ask
-# the analyzer to look for per country.
+# Total: 9 common entities + 5 country-specific entities = 14 per country
 
-# Common entities shared across all countries
+# Common entities shared across all countries (11 total)
 _COMMON_ENTITIES = [
-    "PERSON", "EMAIL_ADDRESS", "PHONE_NUMBER", "IP_ADDRESS",
-    "LOCATION", "DATE_TIME", "URL", "CREDIT_CARD",
+    "PERSON",           # Person names
+    "EMAIL_ADDRESS",    # Email addresses
+    "PHONE_NUMBER",     # Phone numbers
+    "LOCATION",         # Addresses, cities, states
+    "AGE",              # Age mentions
+    "GENDER",           # Gender mentions
+    "ETHNICITY",        # Ethnicity/race
+    "IP_ADDRESS",       # IP addresses
+    "COOKIE",           # Session IDs, tokens, cookies
+    "CERTIFICATE_NUMBER", # Certificates, licenses, policy numbers       # ZIP/postal codes
 ]
 
 # Country-specific entity overrides (merged with common)
+# Each country has exactly 5 country-specific entities
+# Entity names must match the supported_entity in the recognizer classes
 _COUNTRY_SPECIFIC: Dict[str, List[str]] = {
     "United States": [
         "US_SSN", "US_PASSPORT", "US_DRIVER_LICENSE",
-        "US_BANK_NUMBER", "US_ITIN", "MEDICAL_LICENSE",
+        "US_BANK_NUMBER", "US_ITIN", "ZIP_CODE",  
     ],
     "Canada": [
-        "CA_SOCIAL_INSURANCE_NUMBER", "PASSPORT", "DRIVER_LICENSE",
-        "BANK_ACCOUNT", "HEALTH_CARD", "MEDICAL_LICENSE",
+        "CA_SIN",  # Not CA_SOCIAL_INSURANCE_NUMBER
+        "CA_BANK_NUMBER",  # Not CA_BANK_ACCOUNT
+        "CA_DRIVER_LICENSE",
+        # Note: CA_PASSPORT and CA_HEALTH_CARD don't have recognizers yet
     ],
     "Mexico": [
-        "CURP", "RFC", "PASSPORT", "DRIVER_LICENSE",
-        "BANK_ACCOUNT", "MEDICAL_LICENSE",
+        "MX_CURP", "MX_RFC", "MX_DRIVER_LICENSE",
+        # Note: MX_PASSPORT and MX_BANK_ACCOUNT don't have recognizers yet
     ],
     "United Kingdom": [
-        "UK_NHS", "UK_NINO", "PASSPORT", "DRIVER_LICENSE",
-        "IBAN_CODE", "MEDICAL_LICENSE",
+        "UK_NHS", "UK_NINO", "UK_DRIVER_LICENSE",
+        "IBAN_CODE",  # For UK_IBAN
+        # Note: UK_PASSPORT doesn't have a recognizer yet
     ],
     "Germany": [
-        "DE_ID_CARD", "PASSPORT", "DRIVER_LICENSE",
-        "IBAN_CODE", "DE_TAX_ID", "MEDICAL_LICENSE",
+        "DE_DRIVER_LICENSE", "DE_TAX_NUMBER",
+        "IBAN_CODE",  # For DE_IBAN
+        # Note: DE_ID_CARD, DE_PASSPORT don't have recognizers yet
     ],
     "France": [
-        "FR_INSEE", "PASSPORT", "DRIVER_LICENSE",
-        "IBAN_CODE", "FR_TAX_ID", "MEDICAL_LICENSE",
+        "FR_INSEE", "FR_DRIVER_LICENSE",
+        "IBAN_CODE",  # For FR_IBAN
+        # Note: FR_PASSPORT, FR_TAX_ID don't have recognizers yet
     ],
     "UAE": [
-        "EMIRATES_ID", "PASSPORT", "DRIVER_LICENSE",
-        "BANK_ACCOUNT", "UAE_TRN", "MEDICAL_LICENSE",
+        "AE_EMIRATES_ID", "AE_TRN", "AE_DRIVER_LICENSE",
+        # Note: UAE_PASSPORT, UAE_BANK_ACCOUNT don't have recognizers yet
     ],
     "Saudi Arabia": [
-        "SA_NATIONAL_ID", "PASSPORT", "DRIVER_LICENSE",
-        "IBAN_CODE", "SA_IQAMA", "MEDICAL_LICENSE",
+        "SA_NATIONAL_ID",
+        "IBAN_CODE",  # For SA_IBAN
+        # Note: SA_PASSPORT, SA_DRIVER_LICENSE, SA_IQAMA don't have recognizers yet
     ],
     "South Africa": [
-        "ZA_ID_NUMBER", "PASSPORT", "DRIVER_LICENSE",
-        "BANK_ACCOUNT", "ZA_TAX_NUMBER", "MEDICAL_LICENSE",
+        "ZA_ID_NUMBER", "ZA_TAX_NUMBER", "ZA_DRIVER_LICENSE",
+        # Note: ZA_PASSPORT, ZA_BANK_ACCOUNT don't have recognizers yet
     ],
     "Japan": [
-        "JP_MY_NUMBER", "PASSPORT", "DRIVER_LICENSE",
-        "BANK_ACCOUNT", "JP_RESIDENCE_CARD", "MEDICAL_LICENSE",
+        "JP_MY_NUMBER", "JP_DRIVER_LICENSE", "JP_BANK_NUMBER",
+        # Note: JP_PASSPORT, JP_RESIDENCE_CARD don't have recognizers yet
     ],
     "India": [
-        "IN_AADHAAR", "IN_PAN", "PASSPORT", "DRIVER_LICENSE",
-        "IN_VOTER_ID", "MEDICAL_LICENSE",
+        "IN_AADHAAR", "IN_PAN", "IN_PASSPORT",
+        "IN_DRIVER_LICENSE", "IN_VOTER",  # Not IN_VOTER_ID
     ],
     "Australia": [
-        "AU_TFN", "AU_MEDICARE", "PASSPORT", "DRIVER_LICENSE",
-        "BANK_ACCOUNT", "MEDICAL_LICENSE",
+        "AU_TFN", "AU_MEDICARE", "AU_DRIVER_LICENSE",
+        # Note: AU_PASSPORT, AU_BANK_ACCOUNT don't have recognizers yet
     ],
     "Singapore": [
-        "SG_NRIC_FIN", "PASSPORT", "DRIVER_LICENSE",
-        "BANK_ACCOUNT", "SG_UEN", "MEDICAL_LICENSE",
+        "SG_NRIC_FIN", "SG_PASSPORT", "SG_BANK_NUMBER",  # Not SG_BANK_ACCOUNT
+        "SG_UEN",
+        # Note: SG_DRIVER_LICENSE doesn't have a recognizer yet
     ],
     "Malaysia": [
-        "MY_NRIC", "PASSPORT", "DRIVER_LICENSE",
-        "BANK_ACCOUNT", "MY_TAX_ID", "MEDICAL_LICENSE",
+        "MY_NRIC", "MY_INCOME_TAX",  # Not MY_TAX_ID
+        "MY_BANK_NUMBER",  # Not MY_BANK_ACCOUNT
+        # Note: MY_PASSPORT, MY_DRIVER_LICENSE don't have recognizers yet
     ],
 }
 
 
 def get_entities_for_country(country: str) -> List[str]:
-    """Return the full entity list (common + country-specific) for a country."""
+    """
+    Return the full entity list (common + country-specific) for a country.
+    
+    Args:
+        country: Country name (e.g., "United States", "Canada")
+        
+    Returns:
+        List of entity names to detect (16 total: 11 common + 5 country-specific)
+        
+    Example:
+        >>> get_entities_for_country("Canada")
+        ['PERSON', 'EMAIL_ADDRESS', ..., 'CA_SIN', 'CA_BANK_NUMBER', ...]
+    """
     specific = _COUNTRY_SPECIFIC.get(country, _COUNTRY_SPECIFIC[DEFAULT_COUNTRY])
     return list(dict.fromkeys(_COMMON_ENTITIES + specific))  # deduplicated, order preserved
-
-
-# ============================================================
-# COUNTRY-SPECIFIC REGEX PATTERNS
-# ============================================================
-# Each entry: (entity_name, compiled_regex, context_words, score)
-
-_US_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("US_SSN", re.compile(r"\b\d{3}-\d{2}-\d{4}\b"), ["ssn", "social security"], 0.85),
-    ("US_SSN", re.compile(r"\b\d{9}\b"), ["ssn", "social security"], 0.6),
-    ("US_ITIN", re.compile(r"\b9\d{2}-[7-9]\d-\d{4}\b"), ["itin", "tax"], 0.85),
-    ("US_BANK_NUMBER", re.compile(r"\b\d{8,17}\b"), ["account", "bank", "routing"], 0.5),
-    ("US_PASSPORT", re.compile(r"\b[A-Z]?\d{8,9}\b"), ["passport"], 0.6),
-    ("US_DRIVER_LICENSE", re.compile(r"\b[A-Z]\d{7,14}\b"), ["driver", "license", "dl"], 0.6),
-]
-
-_CA_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("CA_SOCIAL_INSURANCE_NUMBER", re.compile(r"\b\d{3}[\s-]?\d{3}[\s-]?\d{3}\b"), ["sin", "social insurance"], 0.85),
-    ("HEALTH_CARD", re.compile(r"\b\d{4}[\s-]?\d{3}[\s-]?\d{3}[\s-]?[A-Z]{2}\b"), ["health card", "ohip"], 0.8),
-    ("PASSPORT", re.compile(r"\b[A-Z]{2}\d{6}\b"), ["passport"], 0.7),
-]
-
-_MX_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("CURP", re.compile(r"\b[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d\b"), ["curp"], 0.95),
-    ("RFC", re.compile(r"\b[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}\b"), ["rfc", "tax"], 0.9),
-]
-
-_UK_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("UK_NINO", re.compile(r"\b[A-CEGHJ-PR-TW-Z]{2}\d{6}[A-D]\b", re.I), ["nino", "national insurance"], 0.9),
-    ("UK_NHS", re.compile(r"\b\d{3}[\s-]?\d{3}[\s-]?\d{4}\b"), ["nhs"], 0.8),
-    ("PASSPORT", re.compile(r"\b\d{9}\b"), ["passport"], 0.6),
-]
-
-_DE_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("DE_TAX_ID", re.compile(r"\b\d{11}\b"), ["steuer", "tax", "tin"], 0.7),
-    ("DE_ID_CARD", re.compile(r"\b[CFGHJKLMNPRTVWXYZ0-9]{9}\b"), ["personalausweis", "id card"], 0.6),
-]
-
-_FR_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("FR_INSEE", re.compile(r"\b[12]\d{2}(0[1-9]|1[0-2])\d{2}\d{3}\d{3}\d{2}\b"), ["insee", "securite sociale"], 0.9),
-    ("FR_TAX_ID", re.compile(r"\b\d{13}\b"), ["fiscal", "tax"], 0.6),
-]
-
-_UAE_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("EMIRATES_ID", re.compile(r"\b784-\d{4}-\d{7}-\d\b"), ["emirates id", "eid"], 0.95),
-    ("UAE_TRN", re.compile(r"\b\d{15}\b"), ["trn", "tax registration"], 0.6),
-]
-
-_SA_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("SA_NATIONAL_ID", re.compile(r"\b[12]\d{9}\b"), ["national id", "huwiyya"], 0.8),
-    ("SA_IQAMA", re.compile(r"\b2\d{9}\b"), ["iqama", "residence"], 0.7),
-]
-
-_ZA_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("ZA_ID_NUMBER", re.compile(r"\b\d{13}\b"), ["id number", "identity"], 0.7),
-    ("ZA_TAX_NUMBER", re.compile(r"\b\d{10}\b"), ["tax", "sars"], 0.6),
-]
-
-_JP_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("JP_MY_NUMBER", re.compile(r"\b\d{12}\b"), ["my number", "マイナンバー"], 0.8),
-    ("JP_RESIDENCE_CARD", re.compile(r"\b[A-Z]{2}\d{8}[A-Z]{2}\b"), ["residence card", "在留カード"], 0.85),
-]
-
-_IN_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("IN_AADHAAR", re.compile(r"\b\d{4}[\s-]?\d{4}[\s-]?\d{4}\b"), ["aadhaar", "aadhar", "uid"], 0.85),
-    ("IN_PAN", re.compile(r"\b[A-Z]{5}\d{4}[A-Z]\b"), ["pan", "permanent account"], 0.9),
-    ("IN_VOTER_ID", re.compile(r"\b[A-Z]{3}\d{7}\b"), ["voter", "epic"], 0.8),
-]
-
-_AU_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("AU_TFN", re.compile(r"\b\d{3}[\s-]?\d{3}[\s-]?\d{3}\b"), ["tfn", "tax file"], 0.8),
-    ("AU_MEDICARE", re.compile(r"\b\d{4}[\s-]?\d{5}[\s-]?\d[\s-]?\d?\b"), ["medicare"], 0.8),
-]
-
-_SG_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("SG_NRIC_FIN", re.compile(r"\b[STFGM]\d{7}[A-Z]\b"), ["nric", "fin"], 0.9),
-    ("SG_UEN", re.compile(r"\b\d{8,9}[A-Z]\b"), ["uen", "business"], 0.7),
-]
-
-_MY_PATTERNS: List[Tuple[str, re.Pattern, List[str], float]] = [
-    ("MY_NRIC", re.compile(r"\b\d{6}-\d{2}-\d{4}\b"), ["nric", "ic", "mykad"], 0.9),
-    ("MY_TAX_ID", re.compile(r"\b(IG|SG|OG|C|D)\d{10}\b"), ["tax", "lhdn"], 0.8),
-]
-
-COUNTRY_REGEX_MAP: Dict[str, List[Tuple[str, re.Pattern, List[str], float]]] = {
-    "United States": _US_PATTERNS,
-    "Canada": _CA_PATTERNS,
-    "Mexico": _MX_PATTERNS,
-    "United Kingdom": _UK_PATTERNS,
-    "Germany": _DE_PATTERNS,
-    "France": _FR_PATTERNS,
-    "UAE": _UAE_PATTERNS,
-    "Saudi Arabia": _SA_PATTERNS,
-    "South Africa": _ZA_PATTERNS,
-    "Japan": _JP_PATTERNS,
-    "India": _IN_PATTERNS,
-    "Australia": _AU_PATTERNS,
-    "Singapore": _SG_PATTERNS,
-    "Malaysia": _MY_PATTERNS,
-}
-
-
-def get_regex_patterns_for_country(
-    country: str,
-) -> List[Tuple[str, re.Pattern, List[str], float]]:
-    """Return regex patterns for a given country (defaults to US)."""
-    return COUNTRY_REGEX_MAP.get(country, COUNTRY_REGEX_MAP[DEFAULT_COUNTRY])

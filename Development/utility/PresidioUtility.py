@@ -1,22 +1,22 @@
 """
 Presidio utility for PII detection and anonymization.
-Supports country-specific PII entity detection with custom regex recognizers.
+Supports country-specific PII entity detection using Presidio's built-in recognizers
+plus programmatically registered custom recognizers for entities not in Presidio.
 """
-from presidio_analyzer import AnalyzerEngine, RecognizerResult, PatternRecognizer, Pattern
+from presidio_analyzer import AnalyzerEngine, RecognizerResult
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
 from typing import List, Dict, Optional
 import base64
 import os
-import re
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 from utility.exceptions import PresidioException
 from utility.country_pii_config import (
     get_entities_for_country,
-    get_regex_patterns_for_country,
     DEFAULT_COUNTRY,
 )
+from utility.custom_recognizers import get_custom_recognizers
 import logging
 
 logger = logging.getLogger(__name__)
@@ -88,34 +88,20 @@ class PresidioUtility:
 
     def __init__(self):
         try:
+            # Initialize Presidio with default recognizers
             self.analyzer = AnalyzerEngine()
             self.anonymizer = AnonymizerEngine()
+            
+            # Register custom recognizers programmatically
+            custom_recognizers = get_custom_recognizers()
+            for recognizer in custom_recognizers:
+                self.analyzer.registry.add_recognizer(recognizer)
+            
             logger.info("Presidio engines initialised")
+            logger.info(f"Loaded {len(self.analyzer.registry.recognizers)} recognizers "
+                       f"({len(custom_recognizers)} custom)")
         except Exception as e:
             raise PresidioException(f"Failed to initialise Presidio: {e}")
-
-    # ------------------------------------------------------------------
-    # Country-specific recognizer registration
-    # ------------------------------------------------------------------
-    def _register_country_recognizers(self, country: str) -> None:
-        """Add regex-based PatternRecognizers for *country* to the registry."""
-        registry = self.analyzer.registry
-        patterns = get_regex_patterns_for_country(country)
-        for entity_name, regex, context, score in patterns:
-            recognizer_name = f"{country}_{entity_name}_recognizer"
-            # Avoid duplicate registration
-            existing = [r.name for r in registry.recognizers]
-            if recognizer_name in existing:
-                continue
-            pat = Pattern(name=entity_name, regex=regex.pattern, score=score)
-            rec = PatternRecognizer(
-                supported_entity=entity_name,
-                name=recognizer_name,
-                patterns=[pat],
-                context=context,
-                supported_language="en",
-            )
-            registry.add_recognizer(rec)
 
     # ------------------------------------------------------------------
     # Detection
@@ -126,20 +112,35 @@ class PresidioUtility:
         language: str = "en",
         country: str = DEFAULT_COUNTRY,
     ) -> List[RecognizerResult]:
-        """Detect PII entities using country-specific rules."""
+        """
+        Detect PII entities using country-specific rules.
+        
+        Presidio automatically uses its built-in and custom recognizers based on
+        the entity list provided. No manual recognizer registration needed.
+        
+        Args:
+            text: Text to analyze
+            language: Language code (default: "en")
+            country: Country name for country-specific entities
+            
+        Returns:
+            List of detected PII entities with scores >= 0.5
+        """
         try:
             if not text or not text.strip():
                 return []
 
-            self._register_country_recognizers(country)
+            # Get entity list for this country (9 common + 5 country-specific)
             entities = get_entities_for_country(country)
 
+            # Presidio automatically uses the appropriate recognizers
             results = self.analyzer.analyze(
                 text=text,
                 language=language,
                 entities=entities,
             )
 
+            # Filter by score and resolve overlaps
             filtered = [e for e in results if e.score >= 0.5]
             resolved = self._resolve_overlapping_entities(filtered)
             logger.info(f"Detected {len(resolved)} PII entities for country={country}")
