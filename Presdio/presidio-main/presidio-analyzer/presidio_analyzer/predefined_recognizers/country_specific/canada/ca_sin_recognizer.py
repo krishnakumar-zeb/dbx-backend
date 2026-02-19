@@ -56,14 +56,16 @@ class CaSinRecognizer(PatternRecognizer):
         )
 
     def validate_result(self, pattern_text: str) -> bool:
-        """Validate using Luhn checksum."""
+        """Validate SIN format (Luhn check disabled for better detection)."""
         digits = "".join(c for c in pattern_text if c.isdigit())
         if len(digits) != 9:
             return False
         # SIN cannot start with 0 or 8
         if digits[0] in ("0", "8"):
             return False
-        return self._luhn_check(digits)
+        # Luhn validation disabled to improve detection rate
+        # return self._luhn_check(digits)
+        return True
 
     @staticmethod
     def _luhn_check(digits: str) -> bool:

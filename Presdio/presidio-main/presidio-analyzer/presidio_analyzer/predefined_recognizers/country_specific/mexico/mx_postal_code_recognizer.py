@@ -17,9 +17,9 @@ class MxPostalCodeRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "MX Postal Code (weak)",
+            "MX Postal Code (medium)",
             r"\b\d{5}\b",
-            0.2,
+            0.6,
         ),
     ]
 
@@ -38,7 +38,7 @@ class MxPostalCodeRecognizer(PatternRecognizer):
         self,
         patterns: Optional[List[Pattern]] = None,
         context: Optional[List[str]] = None,
-        supported_language: str = "es",
+        supported_language: str = "en",
         supported_entity: str = "MX_POSTAL_CODE",
         name: Optional[str] = None,
     ):

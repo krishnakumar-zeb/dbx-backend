@@ -27,6 +27,11 @@ class AgeRecognizer(PatternRecognizer):
             0.7,
         ),
         Pattern(
+            "Age hyphenated format (strong)",
+            r"\b(\d{1,3})-year-old\b",
+            0.7,
+        ),
+        Pattern(
             "Age range",
             r"\b(\d{1,3})\s*(?:-|to)\s*(\d{1,3})\s*(?:years?\s+old|yrs?\s+old|y\.?o\.?)\b",
             0.7,
@@ -76,16 +81,18 @@ class AgeRecognizer(PatternRecognizer):
         # Extract just the digits from the pattern
         import re
         digits = re.findall(r'\d+', pattern_text)
-        
+
         if not digits:
             return True
-        
+
         # Check each number found
         for digit_str in digits:
             age = int(digit_str)
-            
+
             # Age should be between 0 and 120 (reasonable human age range)
             if age < 0 or age > 120:
                 return True
-        
+
         return False
+
+ 

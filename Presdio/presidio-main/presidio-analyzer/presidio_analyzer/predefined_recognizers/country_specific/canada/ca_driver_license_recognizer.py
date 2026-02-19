@@ -19,14 +19,14 @@ class CaDriverLicenseRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "Ontario format (medium)",
+            "Ontario format (high)",
             r"\b[A-Z]\d{4}[ -]?\d{5}[ -]?\d{5}\b",
-            0.4,
+            0.9,
         ),
         Pattern(
-            "Quebec format (medium)",
-            r"\b[A-Z]\d{12}\b",
-            0.4,
+            "Quebec format (high)",
+            r"\b[A-Z]\d{4}[ -]?\d{6}[ -]?\d{2}\b",
+            0.9,
         ),
     ]
 

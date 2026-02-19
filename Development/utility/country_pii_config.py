@@ -44,8 +44,8 @@ _COMMON_ENTITIES = [
 # Entity names must match the supported_entity in the recognizer classes
 _COUNTRY_SPECIFIC: Dict[str, List[str]] = {
     "United States": [
-        "US_SSN", "US_PASSPORT", "US_DRIVER_LICENSE",
-        "US_BANK_NUMBER", "US_ITIN", "ZIP_CODE",  
+        "US_SSN", "US_DRIVER_LICENSE",
+        "US_BANK_NUMBER", "ZIP_CODE",  
     ],
     "Canada": [
         "CA_SIN", "CA_BANK_NUMBER", "CA_DRIVER_LICENSE",

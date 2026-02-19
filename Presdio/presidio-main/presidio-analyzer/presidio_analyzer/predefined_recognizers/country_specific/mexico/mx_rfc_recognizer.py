@@ -19,14 +19,14 @@ class MxRfcRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "RFC Individual (medium)",
+            "RFC Individual (high)",
             r"\b[A-Z&Ññ]{4}\d{6}[A-Z0-9]{3}\b",
-            0.5,
+            0.9,
         ),
         Pattern(
-            "RFC Business (medium)",
+            "RFC Business (high)",
             r"\b[A-Z&Ññ]{3}\d{6}[A-Z0-9]{3}\b",
-            0.5,
+            0.9,
         ),
     ]
 
@@ -43,7 +43,7 @@ class MxRfcRecognizer(PatternRecognizer):
         self,
         patterns: Optional[List[Pattern]] = None,
         context: Optional[List[str]] = None,
-        supported_language: str = "es",
+        supported_language: str = "en",
         supported_entity: str = "MX_RFC",
         name: Optional[str] = None,
     ):

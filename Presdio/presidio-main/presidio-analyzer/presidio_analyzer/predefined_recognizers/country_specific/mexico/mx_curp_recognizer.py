@@ -18,9 +18,9 @@ class MxCurpRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "CURP (medium)",
-            r"(?-i)\b[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d\b",
-            0.6,
+            "CURP (case-insensitive)",
+            r"\b[A-Za-z]{4}\d{6}[HMhm][A-Za-z]{5}[A-Za-z0-9]\d\b",
+            0.9,
         ),
     ]
 
@@ -36,7 +36,7 @@ class MxCurpRecognizer(PatternRecognizer):
         self,
         patterns: Optional[List[Pattern]] = None,
         context: Optional[List[str]] = None,
-        supported_language: str = "es",
+        supported_language: str = "en",
         supported_entity: str = "MX_CURP",
         name: Optional[str] = None,
     ):

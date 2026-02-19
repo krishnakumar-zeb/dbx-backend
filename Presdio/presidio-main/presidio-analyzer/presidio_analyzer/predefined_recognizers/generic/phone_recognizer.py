@@ -23,9 +23,10 @@ class PhoneRecognizer(LocalRecognizer):
     Accepts values from 0 to 3, where 0 is the lenient and 3 is the most strictest.
     """
 
-    SCORE = 0.4
+    SCORE = 0.7
     CONTEXT = ["phone", "number", "telephone", "cell", "cellphone", "mobile", "call"]
-    DEFAULT_SUPPORTED_REGIONS = ("US", "UK", "DE", "FE", "IL", "IN", "CA", "BR")
+    # Updated to support all 14 countries: US, CA, MX, GB(UK), DE, FR, AE, SA, ZA, JP, IN, AU, SG, MY
+    DEFAULT_SUPPORTED_REGIONS = ("US", "CA", "MX", "GB", "UK", "DE", "FR", "AE", "SA", "ZA", "JP", "IN", "AU", "SG", "MY")
 
     def __init__(
         self,
@@ -72,7 +73,7 @@ class PhoneRecognizer(LocalRecognizer):
                 try:
                     parsed_number = phonenumbers.parse(text[match.start : match.end])
                     region = phonenumbers.region_code_for_number(parsed_number)
-                    
+
                     # Filter out IP addresses that might be detected as phone numbers
                     matched_text = text[match.start : match.end]
                     if not self._is_ip_address(matched_text):

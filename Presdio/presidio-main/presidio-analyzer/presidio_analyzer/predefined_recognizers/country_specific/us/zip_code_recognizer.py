@@ -76,6 +76,10 @@ class ZipCodeRecognizer(PatternRecognizer):
         
         # For 3-digit ZIP codes (prefixes)
         if len(digits_only) == 3:
+            # Reject common phone area codes (200-999)
+            code = int(digits_only)
+            if code >= 200:  # Most area codes are 200+
+                return True
             # Valid 3-digit ZIP prefixes range from 001 to 999
             # Reject 000
             if digits_only == "000":

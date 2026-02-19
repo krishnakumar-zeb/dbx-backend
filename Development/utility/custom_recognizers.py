@@ -27,8 +27,6 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
         # ============================================================
         from presidio_analyzer.predefined_recognizers.country_specific.us import (
             UsSsnRecognizer,
-            UsItinRecognizer,
-            UsPassportRecognizer,
             UsLicenseRecognizer,  # ⚠️ Correct name is UsLicenseRecognizer, not UsDriverLicenseRecognizer
             UsBankRecognizer,
         )
@@ -36,8 +34,6 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
         
         custom_recognizers.extend([
             UsSsnRecognizer(supported_language="en"),
-            UsItinRecognizer(supported_language="en"),
-            UsPassportRecognizer(supported_language="en"),
             UsLicenseRecognizer(supported_language="en"),
             UsBankRecognizer(supported_language="en"),
             ZipCodeRecognizer(),  # US-specific postal code

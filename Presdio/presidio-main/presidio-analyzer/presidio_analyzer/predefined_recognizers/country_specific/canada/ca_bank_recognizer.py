@@ -20,12 +20,12 @@ class CaBankRecognizer(PatternRecognizer):
         Pattern(
             "Transit-Institution (high)",
             r"\b\d{5}[-]\d{3}\b",
-            0.7,
+            0.9,
         ),
         Pattern(
             "Electronic format (medium)",
             r"\b0\d{8}\b",
-            0.4,
+            0.6,
         ),
     ]
 

@@ -17,9 +17,9 @@ class CaGstRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "GST/HST Number (medium)",
+            "GST/HST Number (high)",
             r"\b\d{9}RT\d{4}\b",
-            0.6,
+            0.8,
         ),
     ]
 

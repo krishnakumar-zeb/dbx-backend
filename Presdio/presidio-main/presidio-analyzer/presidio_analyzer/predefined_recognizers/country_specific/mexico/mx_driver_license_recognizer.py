@@ -17,9 +17,9 @@ class MxDriverLicenseRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "Licencia de Conducir (weak)",
-            r"\b[A-Z0-9]{7,12}\b",
-            0.1,
+            "Licencia de Conducir (14 digits)",
+            r"\b\d{14,16}\b",
+            0.9,
         ),
     ]
 
@@ -37,7 +37,7 @@ class MxDriverLicenseRecognizer(PatternRecognizer):
         self,
         patterns: Optional[List[Pattern]] = None,
         context: Optional[List[str]] = None,
-        supported_language: str = "es",
+        supported_language: str = "en",
         supported_entity: str = "MX_DRIVER_LICENSE",
         name: Optional[str] = None,
     ):
@@ -50,3 +50,27 @@ class MxDriverLicenseRecognizer(PatternRecognizer):
             supported_language=supported_language,
             name=name,
         )
+
+    def validate_result(self, pattern_text: str) -> bool:
+        """
+        Validate that the license contains both letters and digits.
+        This prevents matching pure alphabetic words.
+        """
+        text = pattern_text.strip().upper()
+        has_letter = any(c.isalpha() for c in text)
+        has_digit = any(c.isdigit() for c in text)
+
+        # Must have both letters and digits
+        if not (has_letter and has_digit):
+            return False
+
+        # Must not be all digits (that would be other IDs)
+        if text.isdigit():
+            return False
+
+        # Must not be all letters (that would be words)
+        if text.isalpha():
+            return False
+
+        return True
+ 

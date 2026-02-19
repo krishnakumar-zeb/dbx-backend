@@ -141,7 +141,7 @@ class PresidioUtility:
             )
 
             # Filter by score and requested entities only
-            filtered = [e for e in results if e.score >= 0.3 and e.entity_type in entities]
+            filtered = [e for e in results if e.score >= 0.4 and e.entity_type in entities]
             resolved = self._resolve_overlapping_entities(filtered)
             logger.info(f"Detected {len(resolved)} PII entities for country={country}")
             return resolved
@@ -203,16 +203,31 @@ class PresidioUtility:
     def _resolve_overlapping_entities(
         entities: List[RecognizerResult],
     ) -> List[RecognizerResult]:
+        """Resolve overlapping entities by prioritizing highest score."""
         if not entities:
             return []
-        sorted_ents = sorted(entities, key=lambda x: (x.start, -x.score))
+        
+        # Sort by position first, then by score (highest first)
+        sorted_ents = sorted(entities, key=lambda x: (x.start, x.end, -x.score))
+        
         resolved: List[RecognizerResult] = []
         for ent in sorted_ents:
-            if not any(
-                ent.start < r.end and ent.end > r.start for r in resolved
-            ):
+            # Check if this entity overlaps with any already resolved entity
+            overlaps = [r for r in resolved if ent.start < r.end and ent.end > r.start]
+            
+            if not overlaps:
+                # No overlap, add it
                 resolved.append(ent)
-        return resolved
+            else:
+                # There's overlap - keep the one with higher score
+                for overlap in overlaps:
+                    if ent.score > overlap.score:
+                        # Replace lower score with higher score
+                        resolved.remove(overlap)
+                        resolved.append(ent)
+                        break
+        
+        return sorted(resolved, key=lambda x: x.start)
 
 
 # ============================================================

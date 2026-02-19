@@ -17,9 +17,9 @@ class MxClabeRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "CLABE (medium)",
+            "CLABE (high)",
             r"\b\d{18}\b",
-            0.3,
+            0.8,
         ),
     ]
 
@@ -36,7 +36,7 @@ class MxClabeRecognizer(PatternRecognizer):
         self,
         patterns: Optional[List[Pattern]] = None,
         context: Optional[List[str]] = None,
-        supported_language: str = "es",
+        supported_language: str = "en",
         supported_entity: str = "MX_CLABE",
         name: Optional[str] = None,
     ):
