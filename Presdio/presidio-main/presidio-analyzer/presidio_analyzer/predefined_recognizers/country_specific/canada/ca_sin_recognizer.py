@@ -18,14 +18,14 @@ class CaSinRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "SIN with separators (medium)",
+            "SIN with separators (high)",
             r"\b\d{3}[-\s]\d{3}[-\s]\d{3}\b",
-            0.5,
+            0.7,
         ),
         Pattern(
-            "SIN continuous (weak)",
+            "SIN continuous (medium)",
             r"\b\d{9}\b",
-            0.05,
+            0.4,
         ),
     ]
 

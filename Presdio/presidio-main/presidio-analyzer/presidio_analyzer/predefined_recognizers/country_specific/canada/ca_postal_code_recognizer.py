@@ -18,9 +18,9 @@ class CaPostalCodeRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "CA Postal Code (medium)",
+            "CA Postal Code (high)",
             r"\b[ABCEGHJKLMNPRSTVXY]\d[ABCEGHJKLMNPRSTVWXYZ][ -]?\d[ABCEGHJKLMNPRSTVWXYZ]\d\b",
-            0.5,
+            0.7,
         ),
     ]
 

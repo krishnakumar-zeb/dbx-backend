@@ -140,8 +140,8 @@ class PresidioUtility:
                 entities=entities,
             )
 
-            # Filter by score and resolve overlaps
-            filtered = [e for e in results if e.score >= 0.5]
+            # Filter by score and requested entities only
+            filtered = [e for e in results if e.score >= 0.3 and e.entity_type in entities]
             resolved = self._resolve_overlapping_entities(filtered)
             logger.info(f"Detected {len(resolved)} PII entities for country={country}")
             return resolved

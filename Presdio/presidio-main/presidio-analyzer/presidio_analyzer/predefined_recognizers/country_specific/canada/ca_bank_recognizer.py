@@ -18,14 +18,14 @@ class CaBankRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "Transit-Institution (medium)",
+            "Transit-Institution (high)",
             r"\b\d{5}[-]\d{3}\b",
-            0.4,
+            0.7,
         ),
         Pattern(
-            "Electronic format (weak)",
+            "Electronic format (medium)",
             r"\b0\d{8}\b",
-            0.1,
+            0.4,
         ),
     ]
 

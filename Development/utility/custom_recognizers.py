@@ -55,12 +55,14 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
             MxRfcRecognizer,
             MxDriverLicenseRecognizer,
             MxPostalCodeRecognizer,
+            MxClabeRecognizer,
         )
         custom_recognizers.extend([
             MxCurpRecognizer(supported_language="en"),
             MxRfcRecognizer(supported_language="en"),
             MxDriverLicenseRecognizer(supported_language="en"),
             MxPostalCodeRecognizer(supported_language="en"),
+            MxClabeRecognizer(supported_language="en"),
         ])
         logger.info("Loaded Mexico recognizers")
     except ImportError as e:
@@ -75,12 +77,14 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
             CaBankRecognizer,
             CaDriverLicenseRecognizer,
             CaPostalCodeRecognizer,
+            CaGstRecognizer,
         )
         custom_recognizers.extend([
             CaSinRecognizer(supported_language="en"),
             CaBankRecognizer(supported_language="en"),
             CaDriverLicenseRecognizer(supported_language="en"),
             CaPostalCodeRecognizer(supported_language="en"),
+            CaGstRecognizer(supported_language="en"),
         ])
         logger.info("Loaded Canada recognizers")
     except ImportError as e:
@@ -95,12 +99,16 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
             UkDriverLicenseRecognizer,
             NhsRecognizer,  # ⚠️ Correct name is NhsRecognizer, not UkNhsRecognizer
             UkPostcodeRecognizer,
+            UkSortCodeRecognizer,
+            UkUtrRecognizer,
         )
         custom_recognizers.extend([
             UkNinoRecognizer(supported_language="en"),
             UkDriverLicenseRecognizer(supported_language="en"),
             NhsRecognizer(supported_language="en"),
             UkPostcodeRecognizer(supported_language="en"),
+            UkSortCodeRecognizer(supported_language="en"),
+            UkUtrRecognizer(supported_language="en"),
         ])
         logger.info("Loaded UK recognizers")
     except ImportError as e:
@@ -114,11 +122,13 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
             DeDriverLicenseRecognizer,
             DeTaxNumberRecognizer,
             DePostalCodeRecognizer,
+            DePensionInsuranceRecognizer,
         )
         custom_recognizers.extend([
             DeDriverLicenseRecognizer(supported_language="en"),
             DeTaxNumberRecognizer(supported_language="en"),
             DePostalCodeRecognizer(supported_language="en"),
+            DePensionInsuranceRecognizer(supported_language="en"),
         ])
         logger.info("Loaded Germany recognizers")
     except ImportError as e:
@@ -132,11 +142,13 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
             FrInseeRecognizer,
             FrDriverLicenseRecognizer,
             FrPostalCodeRecognizer,
+            FrSpiRecognizer,
         )
         custom_recognizers.extend([
             FrInseeRecognizer(supported_language="en"),
             FrDriverLicenseRecognizer(supported_language="en"),
             FrPostalCodeRecognizer(supported_language="en"),
+            FrSpiRecognizer(supported_language="en"),
         ])
         logger.info("Loaded France recognizers")
     except ImportError as e:
@@ -169,10 +181,12 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
         from presidio_analyzer.predefined_recognizers.country_specific.saudi import (
             SaNationalIdRecognizer,
             SaPostalCodeRecognizer,
+            SaTinRecognizer,
         )
         custom_recognizers.extend([
             SaNationalIdRecognizer(supported_language="en"),
             SaPostalCodeRecognizer(supported_language="en"),
+            SaTinRecognizer(supported_language="en"),
         ])
         logger.info("Loaded Saudi Arabia recognizers")
     except ImportError as e:
@@ -207,12 +221,14 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
             JpDriverLicenseRecognizer,
             JpBankRecognizer,
             JpPostalCodeRecognizer,
+            JpCorporateNumberRecognizer,
         )
         custom_recognizers.extend([
             JpMyNumberRecognizer(supported_language="en"),
             JpDriverLicenseRecognizer(supported_language="en"),
             JpBankRecognizer(supported_language="en"),
             JpPostalCodeRecognizer(supported_language="en"),
+            JpCorporateNumberRecognizer(supported_language="en"),
         ])
         logger.info("Loaded Japan recognizers")
     except ImportError as e:
@@ -225,18 +241,20 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
         from presidio_analyzer.predefined_recognizers.country_specific.india import (
             InAadhaarRecognizer,
             InPanRecognizer,
-            InPassportRecognizer,
+            #InPassportRecognizer,
             InDriverLicenseRecognizer,
-            InVoterRecognizer,
+            #InVoterRecognizer,
             InPinCodeRecognizer,
+            InIfscRecognizer,
         )
         custom_recognizers.extend([
             InAadhaarRecognizer(supported_language="en"),
             InPanRecognizer(supported_language="en"),
-            InPassportRecognizer(supported_language="en"),
+            #InPassportRecognizer(supported_language="en"),
             InDriverLicenseRecognizer(supported_language="en"),
-            InVoterRecognizer(supported_language="en"),
+            #InVoterRecognizer(supported_language="en"),
             InPinCodeRecognizer(supported_language="en"),
+            InIfscRecognizer(supported_language="en"),
         ])
         logger.info("Loaded India recognizers")
     except ImportError as e:
@@ -251,12 +269,16 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
             AuMedicareRecognizer,
             AuDriverLicenseRecognizer,
             AuPostcodeRecognizer,
+            AuAbnRecognizer,
+            AuBsbRecognizer,
         )
         custom_recognizers.extend([
             AuTfnRecognizer(supported_language="en"),
             AuMedicareRecognizer(supported_language="en"),
             AuDriverLicenseRecognizer(supported_language="en"),
             AuPostcodeRecognizer(supported_language="en"),
+            AuAbnRecognizer(supported_language="en"),
+            AuBsbRecognizer(supported_language="en"),
         ])
         logger.info("Loaded Australia recognizers")
     except ImportError as e:
@@ -310,11 +332,16 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
         # ============================================================
         import os
         from presidio_analyzer.predefined_recognizers import (
+            EmailRecognizer,
+            PhoneRecognizer,
+            IpRecognizer,
+            SpacyRecognizer,
             AgeRecognizer,
             EthnicityRecognizer,
             CookieRecognizer,
             GenderRecognizer,
             CertificateRecognizer,
+            IbanRecognizer,
             # NOTE: ZipCodeRecognizer is US-specific, not generic!
             # Each country has its own postal code recognizer
         )
@@ -325,12 +352,17 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
             "..", "..", "Presdio", "ethnicities.json"
         )
         
-        # Add recognizers
+        # Add common entity recognizers
         custom_recognizers.extend([
-            AgeRecognizer(),
-            GenderRecognizer(),
-            CookieRecognizer(),
-            CertificateRecognizer(),
+            EmailRecognizer(),           # EMAIL_ADDRESS
+            PhoneRecognizer(),           # PHONE_NUMBER
+            IpRecognizer(),              # IP_ADDRESS
+            SpacyRecognizer(),           # PERSON, LOCATION (NER-based)
+            AgeRecognizer(),             # AGE
+            GenderRecognizer(),          # GENDER
+            CookieRecognizer(),          # COOKIE
+            CertificateRecognizer(),     # CERTIFICATE_NUMBER
+            IbanRecognizer(),            # IBAN_CODE
         ])
         
         # Add EthnicityRecognizer with JSON file if it exists
@@ -343,7 +375,7 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
             custom_recognizers.append(EthnicityRecognizer())
             logger.warning(f"EthnicityRecognizer loaded without JSON (file not found: {ethnicities_path})")
         
-        logger.info("Loaded generic recognizers (Age, Gender, Ethnicity, Cookie, Certificate)")
+        logger.info("Loaded generic recognizers (Email, Phone, IP, Spacy/NER, Age, Gender, Ethnicity, Cookie, Certificate, IBAN)")
     except ImportError as e:
         logger.warning(f"Could not load generic recognizers: {e}")
     

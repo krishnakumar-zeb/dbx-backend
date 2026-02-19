@@ -20,12 +20,12 @@ class InPinCodeRecognizer(PatternRecognizer):
         Pattern(
             "IN PIN Code with space (medium)",
             r"\b[1-9]\d{2}\s\d{3}\b",
-            0.4,
+            0.5,
         ),
         Pattern(
-            "IN PIN Code (weak)",
+            "IN PIN Code (medium)",
             r"\b[1-9]\d{5}\b",
-            0.1,
+            0.4,
         ),
     ]
 

@@ -140,6 +140,7 @@ from .country_specific.us.us_itin_recognizer import UsItinRecognizer
 from .country_specific.us.us_mbi_recognizer import UsMbiRecognizer
 from .country_specific.us.us_passport_recognizer import UsPassportRecognizer
 from .country_specific.us.us_ssn_recognizer import UsSsnRecognizer
+from .country_specific.us.zip_code_recognizer import ZipCodeRecognizer
 
 # Generic recognizers
 from .generic.age_recognizer import AgeRecognizer
@@ -156,7 +157,6 @@ from .generic.ip_recognizer import IpRecognizer
 from .generic.mac_recognizer import MacAddressRecognizer
 from .generic.phone_recognizer import PhoneRecognizer
 from .generic.url_recognizer import UrlRecognizer
-from .generic.zip_code_recognizer import ZipCodeRecognizer
 
 # NER recognizers
 from .ner.gliner_recognizer import GLiNERRecognizer

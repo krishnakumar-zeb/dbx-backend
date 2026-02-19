@@ -73,7 +73,7 @@ class CertificateRecognizer(PatternRecognizer):
         # Generic alphanumeric certificate (weak - requires context)
         Pattern(
             "Generic Certificate - Alphanumeric (weak)",
-            r"\b[A-Z]{2,5}\d{5,9}\b",
+            r"\b[A-Z]{2,5}\d{5,15}\b",
             0.3,
         ),
     ]

@@ -1,11 +1,11 @@
 """
 Country-specific PII configuration.
-Maps each supported country to its PII entity types (11 common + 5 country-specific = 16 total).
+Maps each supported country to its PII entity types (10 common + country-specific).
 All entity detection is handled by Presidio's built-in and custom recognizers.
 
-Common Entities (11): PERSON, EMAIL_ADDRESS, PHONE_NUMBER, LOCATION, AGE, GENDER,
-                      ETHNICITY, IP_ADDRESS, COOKIE, CERTIFICATE_NUMBER, ZIP_CODE
-Country-Specific (5): Varies by country (e.g., US_SSN, CA_SIN, etc.)
+Common Entities (10): PERSON, EMAIL_ADDRESS, PHONE_NUMBER, LOCATION, AGE, GENDER,
+                      ETHNICITY, IP_ADDRESS, COOKIE, CERTIFICATE_NUMBER
+Country-Specific: Varies by country (e.g., US_SSN, ZIP_CODE, CA_SIN, etc.)
 
 Note: Regex patterns and recognition logic are defined in Presidio recognizer classes,
 not in this config file. This file only defines which entities to look for per country.
@@ -22,11 +22,11 @@ SUPPORTED_COUNTRIES = [
 DEFAULT_COUNTRY = "United States"
 
 # ============================================================
-# ENTITY LISTS PER COUNTRY (14 per country)
+# ENTITY LISTS PER COUNTRY
 # ============================================================
-# Total: 9 common entities + 5 country-specific entities = 14 per country
+# Total: 10 common entities + country-specific entities
 
-# Common entities shared across all countries (11 total)
+# Common entities shared across all countries (10 total)
 _COMMON_ENTITIES = [
     "PERSON",           # Person names
     "EMAIL_ADDRESS",    # Email addresses
@@ -37,11 +37,10 @@ _COMMON_ENTITIES = [
     "ETHNICITY",        # Ethnicity/race
     "IP_ADDRESS",       # IP addresses
     "COOKIE",           # Session IDs, tokens, cookies
-    "CERTIFICATE_NUMBER", # Certificates, licenses, policy numbers       # ZIP/postal codes
+    "CERTIFICATE_NUMBER", # Certificates, licenses, policy numbers
 ]
 
 # Country-specific entity overrides (merged with common)
-# Each country has exactly 5 country-specific entities
 # Entity names must match the supported_entity in the recognizer classes
 _COUNTRY_SPECIFIC: Dict[str, List[str]] = {
     "United States": [
@@ -84,13 +83,13 @@ _COUNTRY_SPECIFIC: Dict[str, List[str]] = {
         "JP_POSTAL_CODE", "JP_CORPORATE_NUMBER",
     ],
     "India": [
-        "IN_AADHAAR", "IN_PAN", "IN_PASSPORT",
-        "IN_DRIVER_LICENSE", "IN_VOTER",
-        "IN_POSTAL_CODE", "IN_BANK_ACCOUNT",
+        "IN_AADHAAR", "IN_PAN",
+        "IN_DRIVER_LICENSE",
+        "IN_PIN_CODE", "IN_IFSC",
     ],
     "Australia": [
         "AU_TFN", "AU_MEDICARE", "AU_DRIVER_LICENSE",
-        "AU_POSTAL_CODE", "AU_ABN", "AU_BSB", "AU_BANK_ACCOUNT",
+        "AU_POSTAL_CODE", "AU_ABN", "AU_BSB",
     ],
     "Singapore": [
         "SG_NRIC_FIN", "SG_PASSPORT", "SG_BANK_NUMBER",
@@ -111,7 +110,7 @@ def get_entities_for_country(country: str) -> List[str]:
         country: Country name (e.g., "United States", "Canada")
         
     Returns:
-        List of entity names to detect (16 total: 11 common + 5 country-specific)
+        List of entity names to detect (10 common + country-specific)
         
     Example:
         >>> get_entities_for_country("Canada")
