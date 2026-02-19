@@ -49,64 +49,56 @@ _COUNTRY_SPECIFIC: Dict[str, List[str]] = {
         "US_BANK_NUMBER", "US_ITIN", "ZIP_CODE",  
     ],
     "Canada": [
-        "CA_SIN",  # Not CA_SOCIAL_INSURANCE_NUMBER
-        "CA_BANK_NUMBER",  # Not CA_BANK_ACCOUNT
-        "CA_DRIVER_LICENSE",
-        # Note: CA_PASSPORT and CA_HEALTH_CARD don't have recognizers yet
+        "CA_SIN", "CA_BANK_NUMBER", "CA_DRIVER_LICENSE",
+        "CA_POSTAL_CODE", "CA_GST_NUMBER",
     ],
     "Mexico": [
         "MX_CURP", "MX_RFC", "MX_DRIVER_LICENSE",
-        # Note: MX_PASSPORT and MX_BANK_ACCOUNT don't have recognizers yet
+        "MX_POSTAL_CODE", "MX_CLABE",
     ],
     "United Kingdom": [
         "UK_NHS", "UK_NINO", "UK_DRIVER_LICENSE",
-        "IBAN_CODE",  # For UK_IBAN
-        # Note: UK_PASSPORT doesn't have a recognizer yet
+        "UK_POSTAL_CODE", "UK_BANK_SORT_CODE", "UK_UTR", "IBAN_CODE",
     ],
     "Germany": [
-        "DE_DRIVER_LICENSE", "DE_TAX_NUMBER",
-        "IBAN_CODE",  # For DE_IBAN
-        # Note: DE_ID_CARD, DE_PASSPORT don't have recognizers yet
+        "DE_DRIVER_LICENSE", "DE_TAX_NUMBER", "DE_PENSION_INSURANCE",
+        "DE_POSTAL_CODE", "IBAN_CODE",
     ],
     "France": [
-        "FR_INSEE", "FR_DRIVER_LICENSE",
-        "IBAN_CODE",  # For FR_IBAN
-        # Note: FR_PASSPORT, FR_TAX_ID don't have recognizers yet
+        "FR_INSEE", "FR_DRIVER_LICENSE", "FR_SPI",
+        "FR_POSTAL_CODE", "IBAN_CODE",
     ],
     "UAE": [
         "AE_EMIRATES_ID", "AE_TRN", "AE_DRIVER_LICENSE",
-        # Note: UAE_PASSPORT, UAE_BANK_ACCOUNT don't have recognizers yet
+        "AE_POSTAL_CODE",
     ],
     "Saudi Arabia": [
-        "SA_NATIONAL_ID",
-        "IBAN_CODE",  # For SA_IBAN
-        # Note: SA_PASSPORT, SA_DRIVER_LICENSE, SA_IQAMA don't have recognizers yet
+        "SA_NATIONAL_ID", "SA_POSTAL_CODE", "SA_TIN", "IBAN_CODE",
     ],
     "South Africa": [
         "ZA_ID_NUMBER", "ZA_TAX_NUMBER", "ZA_DRIVER_LICENSE",
-        # Note: ZA_PASSPORT, ZA_BANK_ACCOUNT don't have recognizers yet
+        "ZA_POSTAL_CODE",
     ],
     "Japan": [
         "JP_MY_NUMBER", "JP_DRIVER_LICENSE", "JP_BANK_NUMBER",
-        # Note: JP_PASSPORT, JP_RESIDENCE_CARD don't have recognizers yet
+        "JP_POSTAL_CODE", "JP_CORPORATE_NUMBER",
     ],
     "India": [
         "IN_AADHAAR", "IN_PAN", "IN_PASSPORT",
-        "IN_DRIVER_LICENSE", "IN_VOTER",  # Not IN_VOTER_ID
+        "IN_DRIVER_LICENSE", "IN_VOTER",
+        "IN_POSTAL_CODE", "IN_BANK_ACCOUNT",
     ],
     "Australia": [
         "AU_TFN", "AU_MEDICARE", "AU_DRIVER_LICENSE",
-        # Note: AU_PASSPORT, AU_BANK_ACCOUNT don't have recognizers yet
+        "AU_POSTAL_CODE", "AU_ABN", "AU_BSB", "AU_BANK_ACCOUNT",
     ],
     "Singapore": [
-        "SG_NRIC_FIN", "SG_PASSPORT", "SG_BANK_NUMBER",  # Not SG_BANK_ACCOUNT
-        "SG_UEN",
-        # Note: SG_DRIVER_LICENSE doesn't have a recognizer yet
+        "SG_NRIC_FIN", "SG_PASSPORT", "SG_BANK_NUMBER",
+        "SG_UEN", "SG_POSTAL_CODE",
     ],
     "Malaysia": [
-        "MY_NRIC", "MY_INCOME_TAX",  # Not MY_TAX_ID
-        "MY_BANK_NUMBER",  # Not MY_BANK_ACCOUNT
-        # Note: MY_PASSPORT, MY_DRIVER_LICENSE don't have recognizers yet
+        "MY_NRIC", "MY_INCOME_TAX", "MY_BANK_NUMBER",
+        "MY_POSTAL_CODE",
     ],
 }
 
