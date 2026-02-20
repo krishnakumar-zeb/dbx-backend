@@ -24,7 +24,7 @@ class JpMyNumberRecognizer(PatternRecognizer):
         Pattern(
             "My Number continuous (weak)",
             r"\b\d{12}\b",
-            0.1,
+            0.4,
         ),
     ]
 

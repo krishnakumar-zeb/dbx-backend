@@ -19,7 +19,7 @@ class MyBankRecognizer(PatternRecognizer):
         Pattern(
             "MY Account Number (weak)",
             r"\b\d{7,16}\b",
-            0.05,
+            0.3,
         ),
     ]
 

@@ -18,7 +18,7 @@ class MxDriverLicenseRecognizer(PatternRecognizer):
     PATTERNS = [
         Pattern(
             "Licencia de Conducir (14 digits)",
-            r"\b\d{14,16}\b",
+            r"\b[A-Z0-9]{7,12}\b",
             0.9,
         ),
     ]
@@ -73,4 +73,3 @@ class MxDriverLicenseRecognizer(PatternRecognizer):
             return False
 
         return True
- 

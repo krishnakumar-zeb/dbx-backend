@@ -17,9 +17,9 @@ class JpDriverLicenseRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "JP Driver License (weak)",
+            "JP Driver License (weak-medium)",
             r"\b\d{12}\b",
-            0.1,
+            0.4,
         ),
     ]
 

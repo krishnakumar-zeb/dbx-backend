@@ -24,7 +24,7 @@ class InAadhaarRecognizer(PatternRecognizer):
             r"\b[0-9]{12}\b",
             0.3,
         ),
-        Pattern("AADHAR (Weak)", r"\b[0-9]{4}[- :][0-9]{4}[- :][0-9]{4}\b", 0.3),
+        Pattern("AADHAR (Weak)", r"\b[0-9]{4}[- :][0-9]{4}[- :][0-9]{4}\b", 0.4),
     ]
 
     CONTEXT = [

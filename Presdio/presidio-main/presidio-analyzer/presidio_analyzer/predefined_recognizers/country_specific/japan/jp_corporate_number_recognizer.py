@@ -19,7 +19,7 @@ class JpCorporateNumberRecognizer(PatternRecognizer):
         Pattern(
             "JP Corporate Number (weak)",
             r"\b\d{13}\b",
-            0.2,
+            0.4,
         ),
     ]
 

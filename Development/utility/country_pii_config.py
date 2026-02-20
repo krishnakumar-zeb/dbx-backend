@@ -69,14 +69,14 @@ _COUNTRY_SPECIFIC: Dict[str, List[str]] = {
     ],
     "UAE": [
         "AE_EMIRATES_ID", "AE_TRN", "AE_DRIVER_LICENSE",
-        "AE_POSTAL_CODE",
+        "AE_POSTAL_CODE", "IBAN_CODE",
     ],
     "Saudi Arabia": [
         "SA_NATIONAL_ID", "SA_POSTAL_CODE", "SA_TIN", "IBAN_CODE",
     ],
     "South Africa": [
         "ZA_ID_NUMBER", "ZA_TAX_NUMBER", "ZA_DRIVER_LICENSE",
-        "ZA_POSTAL_CODE",
+        "ZA_POSTAL_CODE", "IBAN_CODE",
     ],
     "Japan": [
         "JP_MY_NUMBER", "JP_DRIVER_LICENSE", "JP_BANK_NUMBER",

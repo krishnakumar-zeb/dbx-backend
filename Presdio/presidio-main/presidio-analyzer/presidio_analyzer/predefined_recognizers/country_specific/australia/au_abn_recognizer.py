@@ -29,12 +29,12 @@ class AuAbnRecognizer(PatternRecognizer):
         Pattern(
             "ABN (Medium)",
             r"\b\d{2}\s\d{3}\s\d{3}\s\d{3}\b",
-            0.1,
+            0.4,
         ),
         Pattern(
             "ABN (Low)",
             r"\b\d{11}\b",
-            0.01,
+            0.3,
         ),
     ]
 

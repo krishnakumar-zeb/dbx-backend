@@ -17,9 +17,9 @@ class JpBankRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "JP Bank Zengin (medium)",
+            "JP Bank Zengin (high)",
             r"\b\d{4}-\d{3}\b",
-            0.4,
+            0.75,
         ),
     ]
 

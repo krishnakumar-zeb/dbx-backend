@@ -19,14 +19,14 @@ class UkUtrRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "UTR (weak)",
+            "UTR (medium)",
             r"\b\d{10}\b",
-            0.1,
+            0.5,
         ),
         Pattern(
-            "PAYE Reference (medium)",
+            "PAYE Reference (high)",
             r"\b\d{3}\/[A-Z0-9]{1,10}\b",
-            0.5,
+            0.8,
         ),
     ]
 

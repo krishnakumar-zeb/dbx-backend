@@ -25,7 +25,7 @@ class MyNricRecognizer(PatternRecognizer):
         Pattern(
             "NRIC continuous (weak)",
             r"\b\d{12}\b",
-            0.1,
+            0.3,
         ),
     ]
 

@@ -19,7 +19,7 @@ class AuPostcodeRecognizer(PatternRecognizer):
         Pattern(
             "AU Postcode (weak)",
             r"\b(?:0[289]\d{2}|[1-7]\d{3})\b",
-            0.2,
+            0.3,
         ),
     ]
 

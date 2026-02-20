@@ -24,7 +24,7 @@ class SgBankRecognizer(PatternRecognizer):
         Pattern(
             "SG Account Number (weak)",
             r"\b\d{7,14}\b",
-            0.05,
+            0.3,
         ),
     ]
 

@@ -18,9 +18,9 @@ class NhsRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern(
-            "NHS (medium)",
+            "NHS (high)",
             r"\b([0-9]{3})[- ]?([0-9]{3})[- ]?([0-9]{4})\b",
-            0.5,
+            0.85,
         ),
     ]
 

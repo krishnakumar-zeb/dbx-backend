@@ -19,7 +19,7 @@ class MyPostalCodeRecognizer(PatternRecognizer):
         Pattern(
             "MY Postal Code (weak)",
             r"\b\d{5}\b",
-            0.2,
+            0.3,
         ),
     ]
 

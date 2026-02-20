@@ -20,7 +20,7 @@ class AuDriverLicenseRecognizer(PatternRecognizer):
         Pattern(
             "AU Driver Licence (weak)",
             r"\b\d{6,10}\b",
-            0.05,
+            0.3,
         ),
     ]
 

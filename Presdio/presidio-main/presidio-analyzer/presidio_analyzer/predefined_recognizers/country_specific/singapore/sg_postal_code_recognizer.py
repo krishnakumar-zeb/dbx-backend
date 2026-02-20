@@ -19,7 +19,7 @@ class SgPostalCodeRecognizer(PatternRecognizer):
         Pattern(
             "SG Postal Code (weak)",
             r"\b(?:[0-7]\d|8[0-2])\d{4}\b",
-            0.2,
+            0.3,
         ),
     ]
 
