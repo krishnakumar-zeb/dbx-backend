@@ -28,6 +28,7 @@ from utility.PresidioUtility import PresidioUtility
 from utility.TavilyCountrySearch import TavilyCountrySearch
 
 from services.PDFService import PDFService
+from services.DOCService import DOCService
 from services.DOCXService import DOCXService
 from services.TXTService import TXTService
 from services.CSVService import CSVService
@@ -111,7 +112,7 @@ def _route_to_service(input_type: str, repo, presidio):
     """Return the appropriate service for *input_type*."""
     mapping = {
         "pdf": lambda: PDFService(repo, presidio),
-        "doc": lambda: DOCXService(repo, presidio),
+        "doc": lambda: DOCService(repo, presidio),
         "docx": lambda: DOCXService(repo, presidio),
         "txt": lambda: TXTService(repo, presidio),
         "csv": lambda: CSVService(repo, presidio),

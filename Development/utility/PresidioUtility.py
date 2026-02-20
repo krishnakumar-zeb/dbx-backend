@@ -86,7 +86,16 @@ class ConsistentAnonymizer:
 class PresidioUtility:
     """Presidio PII detection & anonymization with country-specific support."""
 
-    def __init__(self):
+    def __init__(self, chunk_size: int = 900000, chunk_overlap: int = 500):
+        """
+        Initialize Presidio utility.
+        
+        Args:
+            chunk_size: Maximum characters per chunk (default: 90,000)
+                       Set below spaCy limit to leave safety margin
+            chunk_overlap: Characters to overlap between chunks (default: 500)
+                          Ensures entities at boundaries are not missed
+        """
         try:
             # Initialize Presidio with default recognizers
             self.analyzer = AnalyzerEngine()
@@ -97,11 +106,167 @@ class PresidioUtility:
             for recognizer in custom_recognizers:
                 self.analyzer.registry.add_recognizer(recognizer)
             
+            # Chunking configuration
+            self.chunk_size = chunk_size
+            self.chunk_overlap = chunk_overlap
+            
             logger.info("Presidio engines initialised")
             logger.info(f"Loaded {len(self.analyzer.registry.recognizers)} recognizers "
                        f"({len(custom_recognizers)} custom)")
+            logger.info(f"Chunking enabled: chunk_size={chunk_size}, overlap={chunk_overlap}")
         except Exception as e:
             raise PresidioException(f"Failed to initialise Presidio: {e}")
+
+    # ------------------------------------------------------------------
+    # Chunking Methods
+    # ------------------------------------------------------------------
+    def should_chunk(self, text: str) -> bool:
+        """
+        Check if text needs chunking based on configured chunk size.
+        
+        Args:
+            text: Text to check
+            
+        Returns:
+            True if text exceeds chunk_size and needs chunking
+        """
+        return len(text) > self.chunk_size
+    
+    def create_chunks(self, text: str) -> List[Dict]:
+        """
+        Split text into overlapping chunks.
+        
+        Args:
+            text: Text to split into chunks
+            
+        Returns:
+            List of chunk dictionaries with text and offset information
+        """
+        chunks = []
+        text_length = len(text)
+        start = 0
+        chunk_num = 0
+        
+        while start < text_length:
+            chunk_num += 1
+            end = min(start + self.chunk_size, text_length)
+            
+            chunk_info = {
+                'chunk_number': chunk_num,
+                'text': text[start:end],
+                'start_offset': start,
+                'end_offset': end,
+                'length': end - start
+            }
+            
+            chunks.append(chunk_info)
+            
+            # Move to next chunk with overlap
+            if end >= text_length:
+                break
+            start = end - self.chunk_overlap
+        
+        logger.info(f"Created {len(chunks)} chunks from {text_length:,} characters")
+        return chunks
+    
+    def process_chunks(
+        self,
+        chunks: List[Dict],
+        language: str = "en",
+        country: str = DEFAULT_COUNTRY
+    ) -> List[RecognizerResult]:
+        """
+        Process each chunk with Presidio and adjust entity positions.
+        
+        Args:
+            chunks: List of chunk dictionaries from create_chunks()
+            language: Language code
+            country: Country name for country-specific entities
+            
+        Returns:
+            List of all entities with positions adjusted to original text
+        """
+        all_entities = []
+        entities_by_chunk = []
+        
+        for chunk_info in chunks:
+            chunk_num = chunk_info['chunk_number']
+            chunk_text = chunk_info['text']
+            start_offset = chunk_info['start_offset']
+            
+            # Get entity list for this country
+            entities = get_entities_for_country(country)
+            
+            # Detect PII in this chunk
+            chunk_entities = self.analyzer.analyze(
+                text=chunk_text,
+                language=language,
+                entities=entities,
+            )
+            
+            # Filter by score
+            chunk_entities = [e for e in chunk_entities if e.score >= 0.4 and e.entity_type in entities]
+            
+            # Adjust entity positions to match original text
+            for entity in chunk_entities:
+                entity.start += start_offset
+                entity.end += start_offset
+            
+            all_entities.extend(chunk_entities)
+            entities_by_chunk.append(len(chunk_entities))
+            
+            logger.debug(f"Chunk {chunk_num} ({start_offset:,}-{chunk_info['end_offset']:,}): "
+                        f"{len(chunk_entities)} entities")
+        
+        logger.info(f"Processed {len(chunks)} chunks, found {len(all_entities)} entities total")
+        return all_entities
+    
+    def deduplicate_entities(
+        self,
+        entities: List[RecognizerResult]
+    ) -> List[RecognizerResult]:
+        """
+        Remove duplicate entities from overlapping regions.
+        
+        Two entities are duplicates if they have:
+        - Same entity type
+        - Similar positions (within 5 characters)
+        
+        Args:
+            entities: List of entities (possibly with duplicates)
+            
+        Returns:
+            Deduplicated list of entities
+        """
+        if not entities:
+            return []
+        
+        # Sort by position and score (keep highest score for duplicates)
+        sorted_entities = sorted(
+            entities,
+            key=lambda x: (x.start, x.end, -x.score)
+        )
+        
+        deduplicated = []
+        seen_positions = set()
+        
+        for entity in sorted_entities:
+            # Create position key with tolerance (group nearby positions)
+            position_key = (
+                entity.entity_type,
+                entity.start // 5,  # Group positions within 5 chars
+                entity.end // 5
+            )
+            
+            if position_key not in seen_positions:
+                deduplicated.append(entity)
+                seen_positions.add(position_key)
+        
+        duplicates_removed = len(entities) - len(deduplicated)
+        if duplicates_removed > 0:
+            logger.info(f"Removed {duplicates_removed} duplicate entities from overlapping regions")
+        
+        return deduplicated
 
     # ------------------------------------------------------------------
     # Detection
@@ -115,6 +280,10 @@ class PresidioUtility:
         """
         Detect PII entities using country-specific rules.
         
+        Automatically uses chunking for large documents to handle spaCy's
+        max_length limit. Documents larger than chunk_size are split into
+        overlapping chunks, processed separately, and deduplicated.
+        
         Presidio automatically uses its built-in and custom recognizers based on
         the entity list provided. No manual recognizer registration needed.
         
@@ -124,27 +293,50 @@ class PresidioUtility:
             country: Country name for country-specific entities
             
         Returns:
-            List of detected PII entities with scores >= 0.5
+            List of detected PII entities with scores >= 0.4
         """
         try:
             if not text or not text.strip():
                 return []
 
-            # Get entity list for this country (9 common + 5 country-specific)
-            entities = get_entities_for_country(country)
+            # Check if chunking is needed
+            if self.should_chunk(text):
+                logger.info(f"Text length ({len(text):,} chars) exceeds chunk size ({self.chunk_size:,}), using chunking")
+                
+                # Create chunks
+                chunks = self.create_chunks(text)
+                
+                # Process chunks
+                all_entities = self.process_chunks(chunks, language, country)
+                
+                # Deduplicate entities from overlapping regions
+                results = self.deduplicate_entities(all_entities)
+                
+                # Resolve overlapping entities
+                resolved = self._resolve_overlapping_entities(results)
+                
+                logger.info(f"Detected {len(resolved)} PII entities for country={country} (chunked)")
+                return resolved
+            else:
+                # Text is small enough, process normally
+                logger.debug(f"Text length ({len(text):,} chars) within chunk size, processing normally")
+                
+                # Get entity list for this country (9 common + 5 country-specific)
+                entities = get_entities_for_country(country)
 
-            # Presidio automatically uses the appropriate recognizers
-            results = self.analyzer.analyze(
-                text=text,
-                language=language,
-                entities=entities,
-            )
+                # Presidio automatically uses the appropriate recognizers
+                results = self.analyzer.analyze(
+                    text=text,
+                    language=language,
+                    entities=entities,
+                )
 
-            # Filter by score and requested entities only
-            filtered = [e for e in results if e.score >= 0.4 and e.entity_type in entities]
-            resolved = self._resolve_overlapping_entities(filtered)
-            logger.info(f"Detected {len(resolved)} PII entities for country={country}")
-            return resolved
+                # Filter by score and requested entities only
+                filtered = [e for e in results if e.score >= 0.4 and e.entity_type in entities]
+                resolved = self._resolve_overlapping_entities(filtered)
+                logger.info(f"Detected {len(resolved)} PII entities for country={country}")
+                return resolved
+                
         except Exception as e:
             raise PresidioException(f"PII detection failed: {e}")
 

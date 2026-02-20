@@ -104,17 +104,36 @@ _COUNTRY_SPECIFIC: Dict[str, List[str]] = {
 
 def get_entities_for_country(country: str) -> List[str]:
     """
-    Return the full entity list (common + country-specific) for a country.
+    Return the full entity list (common + USA + country-specific) for a country.
+    
+    USA entities are ALWAYS included regardless of detected country, as documents
+    from any country may contain US PII (SSN, ZIP codes, etc.).
     
     Args:
         country: Country name (e.g., "United States", "Canada")
         
     Returns:
-        List of entity names to detect (10 common + country-specific)
+        List of entity names to detect (10 common + USA + country-specific)
         
     Example:
         >>> get_entities_for_country("Canada")
-        ['PERSON', 'EMAIL_ADDRESS', ..., 'CA_SIN', 'CA_BANK_NUMBER', ...]
+        ['PERSON', 'EMAIL_ADDRESS', ..., 'US_SSN', 'ZIP_CODE', ..., 'CA_SIN', 'CA_BANK_NUMBER', ...]
+        
+        >>> get_entities_for_country("United States")
+        ['PERSON', 'EMAIL_ADDRESS', ..., 'US_SSN', 'ZIP_CODE', ...]
     """
-    specific = _COUNTRY_SPECIFIC.get(country, _COUNTRY_SPECIFIC[DEFAULT_COUNTRY])
-    return list(dict.fromkeys(_COMMON_ENTITIES + specific))  # deduplicated, order preserved
+    # Get USA entities (always included)
+    usa_entities = _COUNTRY_SPECIFIC.get("United States", [])
+    
+    # Get country-specific entities
+    if country == "United States":
+        # For USA, don't duplicate USA entities
+        country_entities = []
+    else:
+        # For other countries, get their specific entities
+        country_entities = _COUNTRY_SPECIFIC.get(country, [])
+    
+    # Combine: Common + USA + Country-specific
+    # Use dict.fromkeys to deduplicate while preserving order
+    all_entities = _COMMON_ENTITIES + usa_entities + country_entities
+    return list(dict.fromkeys(all_entities))

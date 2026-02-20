@@ -1,116 +1,138 @@
-"""CSV Service – mask PII in CSV files cell-by-cell."""
+"""
+CSV Service – Handle CSV files by converting to XLSX first.
+
+This service converts CSV files to XLSX using LibreOffice, then processes
+them through the XLSXService for cell-by-cell PII masking.
+This ensures better formatting preservation and consistent handling.
+"""
 from fastapi import UploadFile
-from typing import Dict
-import pandas as pd
-import io
+import tempfile
+import os
 
 from services.BaseService import BaseService
+from services.LibreOfficeConverter import LibreOfficeConverter, ConversionException
+from services.XLSXService import XLSXService
 from utility.exceptions import FileValidationException, DocumentProcessingException
 
 
 class CSVService(BaseService):
+    """
+    Service for processing CSV files.
+    
+    Workflow:
+    1. Save uploaded CSV file to temp location
+    2. Convert CSV to XLSX using LibreOffice
+    3. Process XLSX through XLSXService
+    4. Return anonymized XLSX
+    
+    Note: Output will be XLSX format, not CSV. This is intentional
+    to ensure better formatting preservation and consistent cell-based masking.
+    """
+    
+    def __init__(self, repository, presidio):
+        super().__init__(repository, presidio)
+        self.converter = LibreOfficeConverter()
+        self.xlsx_service = XLSXService(repository, presidio)
 
     def _validate(self, document: UploadFile) -> None:
+        """Validate that the file is a CSV file."""
         fn = (document.filename or "").lower()
         if not fn.endswith(".csv"):
             raise FileValidationException("File must be a .csv file")
 
     def _extract_text(self, raw: bytes, filename: str) -> str:
+        """
+        Extract text from CSV file by converting to XLSX first.
+        
+        Args:
+            raw: Raw CSV file bytes
+            filename: Original filename
+            
+        Returns:
+            Extracted text
+        """
         try:
-            df = pd.read_csv(io.BytesIO(raw))
-            # Concatenate all string cell values for PII scanning
-            return " ".join(
-                str(v) for v in df.values.flatten() if pd.notna(v)
-            )
+            # Save CSV to temp file
+            with tempfile.NamedTemporaryFile(
+                suffix='.csv',
+                delete=False
+            ) as temp_csv:
+                temp_csv.write(raw)
+                temp_csv_path = temp_csv.name
+            
+            try:
+                # Convert to XLSX
+                temp_xlsx_path = self.converter.convert_csv_to_xlsx(temp_csv_path)
+                
+                try:
+                    # Extract text from XLSX
+                    with open(temp_xlsx_path, 'rb') as f:
+                        xlsx_bytes = f.read()
+                    
+                    text = self.xlsx_service._extract_text(xlsx_bytes, filename)
+                    
+                    return text
+                    
+                finally:
+                    # Clean up temp XLSX
+                    if os.path.exists(temp_xlsx_path):
+                        os.unlink(temp_xlsx_path)
+            finally:
+                # Clean up temp CSV
+                if os.path.exists(temp_csv_path):
+                    os.unlink(temp_csv_path)
+                    
+        except ConversionException as e:
+            raise DocumentProcessingException(f"CSV to XLSX conversion failed: {e}")
         except Exception as e:
-            raise DocumentProcessingException(f"CSV parse failed: {e}")
+            raise DocumentProcessingException(f"CSV text extraction failed: {e}")
 
     def _build_masked_output(self, raw, mapping, anonymized_text, out_path):
-        """Apply tag replacements to every cell in the CSV."""
+        """
+        Build masked output by converting to XLSX and masking.
+        
+        Args:
+            raw: Original CSV file bytes
+            mapping: PII mapping (not used directly)
+            anonymized_text: Text with PII replaced by tags
+            out_path: Output file path (will be XLSX)
+        """
         try:
-            df = pd.read_csv(io.BytesIO(raw))
-            # Build original->tag lookup from anonymized_text
-            # We replace in each cell using the mapping tags
-            from utility.PresidioUtility import decrypt_value
-            # We need encryption key – but it's in the caller context.
-            # Instead, do a simpler approach: replace known PII strings
-            # with their tags across all cells.
-            # The mapping is tag->{encrypted_value, ...}
-            # We can't decrypt here, so use the anonymized_text approach:
-            # re-parse the original text and the anonymized text to build
-            # a direct original->tag map.
-            orig_text = " ".join(
-                str(v) for v in df.values.flatten() if pd.notna(v)
-            )
-            replacements = self._build_replacement_pairs(orig_text, anonymized_text)
-            for col in df.columns:
-                df[col] = df[col].apply(
-                    lambda v: self._apply_replacements(str(v), replacements)
-                    if pd.notna(v) else v
-                )
-            df.to_csv(out_path, index=False)
+            # Save CSV to temp file
+            with tempfile.NamedTemporaryFile(
+                suffix='.csv',
+                delete=False
+            ) as temp_csv:
+                temp_csv.write(raw)
+                temp_csv_path = temp_csv.name
+            
+            try:
+                # Convert to XLSX
+                temp_xlsx_path = self.converter.convert_csv_to_xlsx(temp_csv_path)
+                
+                try:
+                    # Read XLSX bytes
+                    with open(temp_xlsx_path, 'rb') as f:
+                        xlsx_bytes = f.read()
+                    
+                    # Process through XLSX service
+                    self.xlsx_service._build_masked_output(
+                        xlsx_bytes,
+                        mapping,
+                        anonymized_text,
+                        out_path
+                    )
+                    
+                finally:
+                    # Clean up temp XLSX
+                    if os.path.exists(temp_xlsx_path):
+                        os.unlink(temp_xlsx_path)
+            finally:
+                # Clean up temp CSV
+                if os.path.exists(temp_csv_path):
+                    os.unlink(temp_csv_path)
+                    
+        except ConversionException as e:
+            raise DocumentProcessingException(f"CSV to XLSX conversion failed: {e}")
         except Exception as e:
             raise DocumentProcessingException(f"CSV masking failed: {e}")
-
-    @staticmethod
-    def _build_replacement_pairs(original: str, anonymized: str) -> Dict[str, str]:
-        """
-        Compare original and anonymized text to extract {original_value: tag} pairs.
-        Uses a simple diff approach: find tags in anonymized text and map them
-        back to the corresponding spans in the original.
-        """
-        import re
-        pairs: Dict[str, str] = {}
-        tag_pattern = re.compile(r"<[A-Z_]+_\d+>")
-        tags = list(tag_pattern.finditer(anonymized))
-        if not tags:
-            return pairs
-
-        # Walk through both texts to align
-        anon_pos = 0
-        orig_pos = 0
-        for match in tags:
-            tag_start = match.start()
-            tag_end = match.end()
-            tag = match.group()
-
-            # Characters before this tag should be the same in both
-            prefix_len = tag_start - anon_pos
-            orig_pos += prefix_len
-            anon_pos = tag_end
-
-            # Find the original value: it's the text in original at orig_pos
-            # that was replaced by the tag. We need to figure out its length.
-            # Look ahead to the next common text after the tag.
-            if anon_pos < len(anonymized):
-                # Find next non-tag text
-                next_tag = tag_pattern.search(anonymized, anon_pos)
-                if next_tag:
-                    next_common = anonymized[anon_pos:next_tag.start()]
-                else:
-                    next_common = anonymized[anon_pos:]
-
-                if next_common and next_common in original[orig_pos:]:
-                    end_idx = original.index(next_common, orig_pos)
-                    orig_value = original[orig_pos:end_idx]
-                    if orig_value.strip():
-                        pairs[orig_value] = tag
-                    orig_pos = end_idx
-                else:
-                    # Fallback: skip ahead
-                    orig_pos += len(tag)
-            else:
-                # Tag is at the end
-                orig_value = original[orig_pos:]
-                if orig_value.strip():
-                    pairs[orig_value] = tag
-                orig_pos = len(original)
-
-        return pairs
-
-    @staticmethod
-    def _apply_replacements(text: str, replacements: Dict[str, str]) -> str:
-        """Apply all replacement pairs to text, longest match first."""
-        for orig in sorted(replacements, key=len, reverse=True):
-            text = text.replace(orig, replacements[orig])
-        return text
