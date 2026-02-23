@@ -5,10 +5,14 @@ Converts DOC/DOCX documents to PDF using LibreOffice headless mode.
 import subprocess
 import os
 import tempfile
+import time
+import logging
 from pathlib import Path
 from typing import Optional
 
 from utility.exceptions import DocumentProcessingException
+
+logger = logging.getLogger(__name__)
 
 
 class ConversionException(DocumentProcessingException):
@@ -125,6 +129,9 @@ class LibreOfficeConverter:
         Raises:
             ConversionException: If conversion fails
         """
+        start_time = time.time()
+        logger.info(f"[TIMING] Starting LibreOffice conversion for {os.path.basename(input_path)}")
+        
         # Validate input
         if not os.path.exists(input_path):
             raise ConversionException(f"Input file not found: {input_path}")
@@ -159,14 +166,19 @@ class LibreOfficeConverter:
             input_path                 # Input file
         ]
         
+        logger.info(f"[TIMING] Executing LibreOffice command...")
+        
         try:
             # Run conversion
+            exec_start = time.time()
             result = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 timeout=300  # 5 minute timeout
             )
+            exec_time = time.time() - exec_start
+            logger.info(f"[TIMING] LibreOffice subprocess completed in {exec_time:.2f}s (returncode: {result.returncode})")
             
             if result.returncode != 0:
                 error_msg = result.stderr or result.stdout or "Unknown error"
@@ -182,6 +194,10 @@ class LibreOfficeConverter:
                 raise ConversionException(
                     f"PDF not created at expected location: {output_pdf}"
                 )
+            
+            pdf_size = os.path.getsize(output_pdf)
+            total_time = time.time() - start_time
+            logger.info(f"[TIMING] LibreOffice conversion total: {total_time:.2f}s (output: {pdf_size:,} bytes)")
             
             return output_pdf
             

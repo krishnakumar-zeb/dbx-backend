@@ -86,15 +86,14 @@ class ConsistentAnonymizer:
 class PresidioUtility:
     """Presidio PII detection & anonymization with country-specific support."""
 
-    def __init__(self, chunk_size: int = 900000, chunk_overlap: int = 500):
+    def __init__(self, chunk_size: int = 100000):
         """
         Initialize Presidio utility.
         
         Args:
-            chunk_size: Maximum characters per chunk (default: 90,000)
-                       Set below spaCy limit to leave safety margin
-            chunk_overlap: Characters to overlap between chunks (default: 500)
-                          Ensures entities at boundaries are not missed
+            chunk_size: Maximum characters per chunk (default: 100,000)
+                       Chunks break at natural boundaries (newlines, periods)
+                       No overlap needed with smart chunking
         """
         try:
             # Initialize Presidio with default recognizers
@@ -108,12 +107,11 @@ class PresidioUtility:
             
             # Chunking configuration
             self.chunk_size = chunk_size
-            self.chunk_overlap = chunk_overlap
             
             logger.info("Presidio engines initialised")
             logger.info(f"Loaded {len(self.analyzer.registry.recognizers)} recognizers "
                        f"({len(custom_recognizers)} custom)")
-            logger.info(f"Chunking enabled: chunk_size={chunk_size}, overlap={chunk_overlap}")
+            logger.info(f"Smart chunking enabled: chunk_size={chunk_size} (natural boundaries)")
         except Exception as e:
             raise PresidioException(f"Failed to initialise Presidio: {e}")
 
@@ -134,7 +132,8 @@ class PresidioUtility:
     
     def create_chunks(self, text: str) -> List[Dict]:
         """
-        Split text into overlapping chunks.
+        Split text into chunks at natural boundaries (newlines, periods).
+        No overlap needed since we break at clean boundaries.
         
         Args:
             text: Text to split into chunks
@@ -143,30 +142,55 @@ class PresidioUtility:
             List of chunk dictionaries with text and offset information
         """
         chunks = []
-        text_length = len(text)
         start = 0
+        text_len = len(text)
         chunk_num = 0
         
-        while start < text_length:
+        while start < text_len:
             chunk_num += 1
-            end = min(start + self.chunk_size, text_length)
             
-            chunk_info = {
-                'chunk_number': chunk_num,
-                'text': text[start:end],
-                'start_offset': start,
-                'end_offset': end,
-                'length': end - start
-            }
-            
-            chunks.append(chunk_info)
-            
-            # Move to next chunk with overlap
-            if end >= text_length:
+            # If remaining text is smaller than limit, take it all
+            if text_len - start <= self.chunk_size:
+                chunks.append({
+                    'chunk_number': chunk_num,
+                    'text': text[start:],
+                    'start_offset': start,
+                    'end_offset': text_len,
+                    'length': text_len - start
+                })
                 break
-            start = end - self.chunk_overlap
+            
+            # Look for natural break point within chunk size
+            end_search = start + self.chunk_size
+            
+            # Priority 1: Newline (paragraph break)
+            break_point = text.rfind("\n", start, end_search)
+            
+            # Priority 2: Sentence end (period + space)
+            # Only use if newline is in first 80% of chunk (prefer paragraph breaks)
+            if break_point == -1 or break_point < (start + int(self.chunk_size * 0.8)):
+                period_break = text.rfind(". ", start, end_search)
+                if period_break != -1:
+                    break_point = period_break + 1  # Include the period
+            
+            # If no clean break found in last 20% of chunk, force the limit
+            if break_point == -1:
+                break_point = end_search
+            
+            chunk_text = text[start:break_point].strip()
+            
+            chunks.append({
+                'chunk_number': chunk_num,
+                'text': chunk_text,
+                'start_offset': start,
+                'end_offset': break_point,
+                'length': len(chunk_text)
+            })
+            
+            start = break_point
         
-        logger.info(f"Created {len(chunks)} chunks from {text_length:,} characters")
+        logger.info(f"Created {len(chunks)} chunks from {text_len:,} characters "
+                   f"(avg: {text_len // len(chunks):,} chars/chunk)")
         return chunks
     
     def process_chunks(
@@ -177,6 +201,7 @@ class PresidioUtility:
     ) -> List[RecognizerResult]:
         """
         Process each chunk with Presidio and adjust entity positions.
+        No deduplication needed since chunks don't overlap.
         
         Args:
             chunks: List of chunk dictionaries from create_chunks()
@@ -187,7 +212,6 @@ class PresidioUtility:
             List of all entities with positions adjusted to original text
         """
         all_entities = []
-        entities_by_chunk = []
         
         for chunk_info in chunks:
             chunk_num = chunk_info['chunk_number']
@@ -213,7 +237,6 @@ class PresidioUtility:
                 entity.end += start_offset
             
             all_entities.extend(chunk_entities)
-            entities_by_chunk.append(len(chunk_entities))
             
             logger.debug(f"Chunk {chunk_num} ({start_offset:,}-{chunk_info['end_offset']:,}): "
                         f"{len(chunk_entities)} entities")
@@ -221,52 +244,7 @@ class PresidioUtility:
         logger.info(f"Processed {len(chunks)} chunks, found {len(all_entities)} entities total")
         return all_entities
     
-    def deduplicate_entities(
-        self,
-        entities: List[RecognizerResult]
-    ) -> List[RecognizerResult]:
-        """
-        Remove duplicate entities from overlapping regions.
-        
-        Two entities are duplicates if they have:
-        - Same entity type
-        - Similar positions (within 5 characters)
-        
-        Args:
-            entities: List of entities (possibly with duplicates)
-            
-        Returns:
-            Deduplicated list of entities
-        """
-        if not entities:
-            return []
-        
-        # Sort by position and score (keep highest score for duplicates)
-        sorted_entities = sorted(
-            entities,
-            key=lambda x: (x.start, x.end, -x.score)
-        )
-        
-        deduplicated = []
-        seen_positions = set()
-        
-        for entity in sorted_entities:
-            # Create position key with tolerance (group nearby positions)
-            position_key = (
-                entity.entity_type,
-                entity.start // 5,  # Group positions within 5 chars
-                entity.end // 5
-            )
-            
-            if position_key not in seen_positions:
-                deduplicated.append(entity)
-                seen_positions.add(position_key)
-        
-        duplicates_removed = len(entities) - len(deduplicated)
-        if duplicates_removed > 0:
-            logger.info(f"Removed {duplicates_removed} duplicate entities from overlapping regions")
-        
-        return deduplicated
+
 
     # ------------------------------------------------------------------
     # Detection
@@ -280,9 +258,8 @@ class PresidioUtility:
         """
         Detect PII entities using country-specific rules.
         
-        Automatically uses chunking for large documents to handle spaCy's
-        max_length limit. Documents larger than chunk_size are split into
-        overlapping chunks, processed separately, and deduplicated.
+        Automatically uses smart chunking for large documents. Chunks break
+        at natural boundaries (newlines, periods) so no overlap or deduplication needed.
         
         Presidio automatically uses its built-in and custom recognizers based on
         the entity list provided. No manual recognizer registration needed.
@@ -301,19 +278,16 @@ class PresidioUtility:
 
             # Check if chunking is needed
             if self.should_chunk(text):
-                logger.info(f"Text length ({len(text):,} chars) exceeds chunk size ({self.chunk_size:,}), using chunking")
+                logger.info(f"Text length ({len(text):,} chars) exceeds chunk size ({self.chunk_size:,}), using smart chunking")
                 
-                # Create chunks
+                # Create chunks at natural boundaries
                 chunks = self.create_chunks(text)
                 
-                # Process chunks
+                # Process chunks (no deduplication needed with natural boundaries)
                 all_entities = self.process_chunks(chunks, language, country)
                 
-                # Deduplicate entities from overlapping regions
-                results = self.deduplicate_entities(all_entities)
-                
                 # Resolve overlapping entities
-                resolved = self._resolve_overlapping_entities(results)
+                resolved = self._resolve_overlapping_entities(all_entities)
                 
                 logger.info(f"Detected {len(resolved)} PII entities for country={country} (chunked)")
                 return resolved

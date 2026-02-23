@@ -33,6 +33,12 @@ class CSVService(BaseService):
         super().__init__(repository, presidio)
         self.converter = LibreOfficeConverter()
         self.xlsx_service = XLSXService(repository, presidio)
+    
+    @staticmethod
+    def _masked_filename(original: str) -> str:
+        """Override to return XLSX extension since CSV is converted to XLSX."""
+        name, _ = os.path.splitext(original)
+        return f"{name}_masked.xlsx"
 
     def _validate(self, document: UploadFile) -> None:
         """Validate that the file is a CSV file."""

@@ -29,6 +29,13 @@ class DOCService(BaseService):
         super().__init__(repository, presidio)
         self.converter = LibreOfficeConverter()
         self.pdf_service = PDFService(repository, presidio)
+        self._temp_pdf_path = None  # Cache PDF path to avoid double conversion
+    
+    @staticmethod
+    def _masked_filename(original: str) -> str:
+        """Override to return PDF extension since DOC is converted to PDF."""
+        name, _ = os.path.splitext(original)
+        return f"{name}_masked.pdf"
     
     def _validate(self, document: UploadFile) -> None:
         """Validate that the file is a .doc file."""
@@ -39,6 +46,7 @@ class DOCService(BaseService):
     def _extract_text(self, raw: bytes, filename: str) -> str:
         """
         Extract text from .doc file by converting to PDF first.
+        Caches the PDF for later use in _build_masked_output().
         
         Args:
             raw: Raw .doc file bytes
@@ -57,24 +65,19 @@ class DOCService(BaseService):
                 temp_doc_path = temp_doc.name
             
             try:
-                # Convert to PDF
-                temp_pdf_path = self.converter.convert_to_pdf(temp_doc_path)
+                # Convert to PDF and CACHE the path
+                self._temp_pdf_path = self.converter.convert_to_pdf(temp_doc_path)
                 
-                try:
-                    # Extract text from PDF
-                    with open(temp_pdf_path, 'rb') as f:
-                        pdf_bytes = f.read()
-                    
-                    text = self.pdf_service._extract_text(pdf_bytes, filename)
-                    
-                    return text
-                    
-                finally:
-                    # Clean up temp PDF
-                    if os.path.exists(temp_pdf_path):
-                        os.unlink(temp_pdf_path)
+                # Extract text from cached PDF
+                with open(self._temp_pdf_path, 'rb') as f:
+                    pdf_bytes = f.read()
+                
+                text = self.pdf_service._extract_text(pdf_bytes, filename)
+                
+                return text
+                
             finally:
-                # Clean up temp DOC
+                # Clean up temp DOC (but keep PDF cached)
                 if os.path.exists(temp_doc_path):
                     os.unlink(temp_doc_path)
                     
@@ -85,50 +88,35 @@ class DOCService(BaseService):
     
     def _build_masked_output(self, raw, mapping, anonymized_text, out_path):
         """
-        Build masked output by converting to PDF and redacting.
+        Build masked output using the CACHED PDF (no re-conversion).
         
         Args:
-            raw: Original .doc file bytes
+            raw: Original .doc file bytes (not used, PDF is cached)
             mapping: PII mapping (not used directly)
             anonymized_text: Text with PII replaced by tags
             out_path: Output file path (will be PDF)
         """
         try:
-            # Save .doc to temp file
-            with tempfile.NamedTemporaryFile(
-                suffix='.doc',
-                delete=False
-            ) as temp_doc:
-                temp_doc.write(raw)
-                temp_doc_path = temp_doc.name
+            # Use cached PDF instead of converting again
+            if not self._temp_pdf_path or not os.path.exists(self._temp_pdf_path):
+                raise DocumentProcessingException("Cached PDF not found - conversion may have failed")
             
-            try:
-                # Convert to PDF
-                temp_pdf_path = self.converter.convert_to_pdf(temp_doc_path)
-                
-                try:
-                    # Read PDF bytes
-                    with open(temp_pdf_path, 'rb') as f:
-                        pdf_bytes = f.read()
-                    
-                    # Process through PDF service
-                    self.pdf_service._build_masked_output(
-                        pdf_bytes,
-                        mapping,
-                        anonymized_text,
-                        out_path
-                    )
-                    
-                finally:
-                    # Clean up temp PDF
-                    if os.path.exists(temp_pdf_path):
-                        os.unlink(temp_pdf_path)
-            finally:
-                # Clean up temp DOC
-                if os.path.exists(temp_doc_path):
-                    os.unlink(temp_doc_path)
-                    
-        except ConversionException as e:
-            raise DocumentProcessingException(f"DOC to PDF conversion failed: {e}")
+            # Read cached PDF bytes
+            with open(self._temp_pdf_path, 'rb') as f:
+                pdf_bytes = f.read()
+            
+            # Process through PDF service
+            self.pdf_service._build_masked_output(
+                pdf_bytes,
+                mapping,
+                anonymized_text,
+                out_path
+            )
+            
         except Exception as e:
             raise DocumentProcessingException(f"DOC masking failed: {e}")
+        finally:
+            # Clean up cached PDF after processing
+            if self._temp_pdf_path and os.path.exists(self._temp_pdf_path):
+                os.unlink(self._temp_pdf_path)
+                self._temp_pdf_path = None

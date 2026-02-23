@@ -2,9 +2,13 @@
 from fastapi import UploadFile
 from typing import Dict, List
 import io
-
+import re
+import time
+import logging
 from services.BaseService import BaseService
 from utility.exceptions import FileValidationException, DocumentProcessingException
+
+logger = logging.getLogger(__name__)
 
 try:
     import fitz  # PyMuPDF
@@ -26,23 +30,46 @@ class PDFService(BaseService):
 
     def _extract_text(self, raw: bytes, filename: str) -> str:
         """Extract text from PDF using PyMuPDF."""
+        start_time = time.time()
+        logger.info(f"[TIMING] Starting PDF text extraction for {filename} ({len(raw):,} bytes)")
+        
         try:
+            open_start = time.time()
             doc = fitz.open(stream=raw, filetype="pdf")
+            open_time = time.time() - open_start
+            page_count = len(doc)
+            logger.info(f"[TIMING] Opened PDF in {open_time:.2f}s ({page_count} pages)")
+            
             text_parts = []
-            for page_num in range(len(doc)):
+            extract_start = time.time()
+            for page_num in range(page_count):
                 page = doc[page_num]
                 page_text = page.get_text()
                 if page_text:
                     text_parts.append(page_text)
+                
+                # Log progress every 10 pages for large documents
+                if (page_num + 1) % 10 == 0:
+                    elapsed = time.time() - extract_start
+                    logger.info(f"[TIMING] Extracted {page_num + 1}/{page_count} pages in {elapsed:.2f}s")
+            
+            extract_time = time.time() - extract_start
+            logger.info(f"[TIMING] Extracted text from all {page_count} pages in {extract_time:.2f}s")
+            
             doc.close()
-            return "\n".join(text_parts).strip()
+            result = "\n".join(text_parts).strip()
+            
+            total_time = time.time() - start_time
+            logger.info(f"[TIMING] Total PDF text extraction: {total_time:.2f}s ({len(result):,} chars, {len(result)/total_time:.0f} chars/sec)")
+            
+            return result
         except Exception as e:
             raise DocumentProcessingException(f"PDF text extraction failed: {e}")
 
     def _build_masked_output(self, raw, mapping, anonymized_text, out_path):
         """
         Redact PII in original PDF while preserving formatting.
-        Uses PyMuPDF to find and redact PII text in-place.
+        Uses PyMuPDF's get_text("dict") for efficient text position lookup.
 
         Args:
             raw: Original PDF bytes
@@ -68,28 +95,25 @@ class PDFService(BaseService):
                 doc.close()
                 return
 
-            # Process each page
+            # Process each page using efficient dictionary-based approach
             for page_num in range(len(doc)):
                 page = doc[page_num]
-
-                # For each PII value, find and redact it
-                for original_value, tag in replacements.items():
-                    if not original_value or not original_value.strip():
-                        continue
-
-                    # Search for the text on the page
-                    text_instances = page.search_for(original_value)
-
-                    # Redact each instance
-                    for inst in text_instances:
-                        # Add redaction annotation with the tag as replacement text
-                        page.add_redact_annot(
-                            inst, 
-                            text=tag,
-                            fill=(1, 1, 1),  # White background
-                            text_color=(0, 0, 0)  # Black text
-                        )
-
+                
+                # Get text with position information
+                text_dict = page.get_text("dict")
+                
+                # Find positions for all PII values on this page
+                pii_positions = self._find_text_positions(text_dict, replacements)
+                
+                # Add redaction annotations for all found PII
+                for pii_value, tag, bbox in pii_positions:
+                    page.add_redact_annot(
+                        bbox,
+                        text=tag,
+                        fill=(1, 1, 1),  # White background
+                        text_color=(0, 0, 0)  # Black text
+                    )
+                
                 # Apply all redactions on this page
                 page.apply_redactions()
 
@@ -115,7 +139,7 @@ class PDFService(BaseService):
         Returns:
             Dictionary mapping original PII values to their replacement tags
         """
-        import re
+
 
         replacements: Dict[str, str] = {}
 
@@ -186,4 +210,79 @@ class PDFService(BaseService):
                 orig_pos = len(original_text)
 
         return replacements
+
+    def _find_text_positions(
+        self, text_dict: Dict, replacements: Dict[str, str]
+    ) -> List[tuple]:
+        """
+        Find bounding boxes for all PII values in the page using text dictionary.
+        
+        This is much faster than search_for() because we traverse the text structure
+        once and match all PII values in a single pass.
+        
+        Args:
+            text_dict: Page text dictionary from get_text("dict")
+            replacements: Dictionary mapping PII values to their tags
+            
+        Returns:
+            List of tuples: (pii_value, tag, bbox)
+        """
+        positions = []
+        
+        # Build a list of all text spans with their positions
+        text_spans = []
+        
+        for block in text_dict.get("blocks", []):
+            if block.get("type") != 0:  # Skip non-text blocks
+                continue
+                
+            for line in block.get("lines", []):
+                for span in line.get("spans", []):
+                    text = span.get("text", "")
+                    bbox = span.get("bbox")
+                    
+                    if text and bbox:
+                        text_spans.append({
+                            "text": text,
+                            "bbox": fitz.Rect(bbox),
+                            "line_bbox": fitz.Rect(line.get("bbox", bbox))
+                        })
+        
+        # For each PII value, find matching spans
+        for pii_value, tag in replacements.items():
+            if not pii_value or not pii_value.strip():
+                continue
+            
+            # Try to find the PII value in the text spans
+            pii_len = len(pii_value)
+            
+            # Build continuous text from spans to search
+            for i, span in enumerate(text_spans):
+                span_text = span["text"]
+                
+                # Check if PII value starts in this span
+                if pii_value in span_text:
+                    # PII is entirely within this span
+                    positions.append((pii_value, tag, span["bbox"]))
+                    
+                elif pii_value.startswith(span_text):
+                    # PII might span multiple spans - try to build it
+                    combined_text = span_text
+                    combined_bbox = span["bbox"]
+                    
+                    # Look ahead to next spans
+                    for j in range(i + 1, min(i + 10, len(text_spans))):
+                        next_span = text_spans[j]
+                        combined_text += next_span["text"]
+                        combined_bbox = combined_bbox | next_span["bbox"]  # Union of bboxes
+                        
+                        if pii_value in combined_text:
+                            positions.append((pii_value, tag, combined_bbox))
+                            break
+                        
+                        if len(combined_text) > pii_len + 10:
+                            # Gone too far, stop looking
+                            break
+        
+        return positions
  
