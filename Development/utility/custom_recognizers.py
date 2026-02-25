@@ -36,7 +36,7 @@ def get_custom_recognizers() -> List[EntityRecognizer]:
             UsSsnRecognizer(supported_language="en"),
             UsLicenseRecognizer(supported_language="en"),
             UsBankRecognizer(supported_language="en"),
-            ZipCodeRecognizer(),  # US-specific postal code
+            ZipCodeRecognizer(supported_language="en"),  # US-specific postal code
         ])
         logger.info("Loaded United States recognizers")
     except ImportError as e:

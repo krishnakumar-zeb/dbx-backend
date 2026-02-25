@@ -23,7 +23,7 @@
 Development/.env
 Development/**/.env
 Development/data/*.csv
-Development/**/__pycache__/
+Development/**/__pycache__
 Development/**/*.pyc
 Development/**/*.pyo
 Development/**/*.pyd

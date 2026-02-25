@@ -2,13 +2,14 @@
 Main entry point for PII Anonymization API.
 """
 from dotenv import load_dotenv
-load_dotenv()  # Load .env before anything else
+load_dotenv('.env')  # Load .env.example before anything else
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from controllers.PIIController import router as pii_router
 from utility.database import create_tables
 from utility.storage_config import is_csv_mode, init_csv_storage, get_csv_data_path
+from contextlib import asynccontextmanager
 import uvicorn
 import logging
 
@@ -18,6 +19,32 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Suppress Presidio analyzer warnings (they're harmless and verbose)
+logging.getLogger("presidio-analyzer").setLevel(logging.ERROR)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    try:
+        if is_csv_mode():
+            # Initialize CSV storage
+            init_csv_storage()
+            logger.info(f"Application started in CSV mode - Data path: {get_csv_data_path()}")
+        else:
+            # Initialize database
+            create_tables()
+            logger.info("Application started in DATABASE mode")
+    except Exception as e:
+        logger.error(f"Startup failed: {e}")
+        raise
+    
+    yield
+    
+    # Shutdown (if needed in future)
+    logger.info("Application shutting down")
+
+
 app = FastAPI(
     title="PII Anonymization API",
     description=(
@@ -26,6 +53,7 @@ app = FastAPI(
         "Country-specific PII rules for 14 countries."
     ),
     version="2.0.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -39,22 +67,6 @@ app.add_middleware(
 app.include_router(pii_router, prefix="/v1", tags=["PII Processing"])
 
 
-@app.on_event("startup")
-def startup_event():
-    try:
-        if is_csv_mode():
-            # Initialize CSV storage
-            init_csv_storage()
-            logger.info(f"Application started in CSV mode - Data path: {get_csv_data_path()}")
-        else:
-            # Initialize database
-            create_tables()
-            logger.info("Application started in DATABASE mode")
-    except Exception as e:
-        logger.error(f"Startup failed: {e}")
-        raise
-
-
 @app.get("/")
 def root():
     return {"status": "success", "message": "PII Anonymization API is running", "version": "2.0.0"}
@@ -66,4 +78,11 @@ def health_check():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(
+        "main:app", 
+        host="0.0.0.0", 
+        port=8000, 
+        reload=True,
+        log_level="info",
+        access_log=True  # Enable access logs
+    )

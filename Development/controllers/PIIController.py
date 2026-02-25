@@ -25,7 +25,7 @@ from repository.PIIRepository import PIIRepository
 from repository.CSVRepository import CSVRepository
 from utility.storage_config import is_csv_mode
 from utility.PresidioUtility import PresidioUtility
-from utility.TavilyCountrySearch import TavilyCountrySearch
+from utility.PerplexityCountrySearch import PerplexityCountrySearch
 
 from services.PDFService import PDFService
 from services.DOCService import DOCService
@@ -67,24 +67,42 @@ def _get_repository(db_session=None):
         return PIIRepository(db_session)
 
 
+def get_db_session_optional():
+    """
+    Optional database session dependency - only initializes in database mode
+    """
+    if is_csv_mode():
+        yield None
+    else:
+        session = None
+        try:
+            from utility.database import get_db_session
+            gen = get_db_session()
+            session = next(gen)
+            yield session
+        finally:
+            if session:
+                session.close()
+
+
 def _detect_country(
     company_name: Optional[str],
     company_website: Optional[str],
     request_id: str,
 ) -> str:
-    """Use Tavily to resolve company -> country. Falls back to US."""
+    """Use Perplexity to resolve company -> country. Falls back to US."""
     if not company_name:
         logger.info(f"[{request_id}] No company_name provided, defaulting to {DEFAULT_COUNTRY}")
         return DEFAULT_COUNTRY
     try:
-        tavily = TavilyCountrySearch()
+        perplexity = PerplexityCountrySearch()
         ctx = company_website if company_website else None
-        result = tavily.search_prospect_country(company_name, ctx)
+        result = perplexity.search_prospect_country(company_name, ctx)
         if result.matched_from_list and result.country:
             logger.info(f"[{request_id}] Country detected: {result.country}")
             return result.country
     except Exception as e:
-        logger.error(f"[{request_id}] Tavily country detection error: {e}")
+        logger.error(f"[{request_id}] Perplexity country detection error: {e}")
     logger.info(f"[{request_id}] Defaulting to {DEFAULT_COUNTRY}")
     return DEFAULT_COUNTRY
 
@@ -141,7 +159,7 @@ def handle_pii(
     company_name: Optional[str] = Form(None),
     company_website: Optional[str] = Form(None),
     document: UploadFile = File(...),
-    db: Session = Depends(get_db_session),
+    db: Optional[Session] = Depends(get_db_session_optional),
 ) -> Dict:
     request_id = generate_request_id()
     start = datetime.now()
@@ -203,7 +221,7 @@ def unmask_pii(
     request_id: str = Form(...),
     input_type: str = Form(...),
     document: UploadFile = File(...),
-    db: Session = Depends(get_db_session),
+    db: Optional[Session] = Depends(get_db_session_optional),
 ) -> Dict:
     start = datetime.now()
     try:

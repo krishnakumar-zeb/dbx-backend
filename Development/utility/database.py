@@ -49,33 +49,49 @@ def get_oauth_token() -> str:
         raise
 
 
-# Get fresh OAuth token
-access_token = get_oauth_token()
+# Lazy initialization - only create connection when needed
+access_token = None
+engine = None
+SessionLocal = None
 
-# Build PostgreSQL connection URL (using databricks_postgres database)
-DATABASE_URL = (
-    f"postgresql://{quote_plus(CLIENT_ID)}:{quote_plus(access_token)}"
-    f"@{LAKEBASE_HOST}:{LAKEBASE_PORT}/databricks_postgres?sslmode=require"
-)
 
-# Create engine with connection pooling
-engine = create_engine(
-    url=DATABASE_URL,
-    echo=False,  # Set to True for SQL query logging
-    pool_size=10,  # Base pool size
-    max_overflow=20,  # Additional connections when pool is exhausted
-    pool_pre_ping=True,  # Verify connections before using
-    pool_recycle=3600,  # Recycle connections after 1 hour
-    connect_args={"options": f"-c search_path={SCHEMA_NAME}"}
-)
+def _initialize_database():
+    """
+    Initialize database connection (lazy initialization)
+    Only called when database mode is active
+    """
+    global access_token, engine, SessionLocal
+    
+    if engine is not None:
+        return  # Already initialized
+    
+    # Get fresh OAuth token
+    access_token = get_oauth_token()
 
-# Create session maker
-SessionLocal = sessionmaker(
-    bind=engine,
-    autocommit=False,
-    autoflush=False,
-    expire_on_commit=False
-)
+    # Build PostgreSQL connection URL (using databricks_postgres database)
+    DATABASE_URL = (
+        f"postgresql://{quote_plus(CLIENT_ID)}:{quote_plus(access_token)}"
+        f"@{LAKEBASE_HOST}:{LAKEBASE_PORT}/databricks_postgres?sslmode=require"
+    )
+
+    # Create engine with connection pooling
+    engine = create_engine(
+        url=DATABASE_URL,
+        echo=False,  # Set to True for SQL query logging
+        pool_size=10,  # Base pool size
+        max_overflow=20,  # Additional connections when pool is exhausted
+        pool_pre_ping=True,  # Verify connections before using
+        pool_recycle=3600,  # Recycle connections after 1 hour
+        connect_args={"options": f"-c search_path={SCHEMA_NAME}"}
+    )
+
+    # Create session maker
+    SessionLocal = sessionmaker(
+        bind=engine,
+        autocommit=False,
+        autoflush=False,
+        expire_on_commit=False
+    )
 
 
 def get_db_session() -> Generator[Session, None, None]:
@@ -83,6 +99,7 @@ def get_db_session() -> Generator[Session, None, None]:
     Dependency function to get database session
     Yields session and ensures proper cleanup
     """
+    _initialize_database()  # Ensure database is initialized
     session = SessionLocal()
     try:
         yield session
@@ -97,6 +114,7 @@ def create_tables():
     Note: Only creates pii_details table, assessment_details already exists
     """
     try:
+        _initialize_database()  # Ensure database is initialized
         Base.metadata.create_all(engine)
         logger.info("Database tables created successfully")
     except Exception as e:
