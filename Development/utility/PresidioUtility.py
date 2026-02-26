@@ -2,6 +2,11 @@
 Presidio utility for PII detection and anonymization.
 Supports country-specific PII entity detection using Presidio's built-in recognizers
 plus programmatically registered custom recognizers for entities not in Presidio.
+
+PERSON Entity Enhancement:
+- Automatically includes titles (Mr, Mrs, Dr, etc.) before names
+- Automatically expands to include last names (capitalized words after first name)
+- Example: "Mr. John Khan" is detected as a single PERSON entity
 """
 from presidio_analyzer import AnalyzerEngine, RecognizerResult
 from presidio_anonymizer import AnonymizerEngine
@@ -76,17 +81,32 @@ class ConsistentAnonymizer:
         return {
             tag: {
                 "encrypted_value": enc_val,
-                "entity_type": tag.split("_")[0].strip("<>"),
-                "score": best_scores.get(tag.split("_")[0].strip("<>"), 0.0),
+                "entity_type": self._extract_entity_type_from_tag(tag),
+                "score": best_scores.get(self._extract_entity_type_from_tag(tag), 0.0),
             }
             for tag, enc_val in self.tag_to_encrypted.items()
         }
+    
+    def _extract_entity_type_from_tag(self, tag: str) -> str:
+        """
+        Extract entity type from tag.
+        Examples:
+            <PERSON_0> -> PERSON
+            <US_DRIVER_LICENSE_0> -> US_DRIVER_LICENSE
+            <EMAIL_ADDRESS_1> -> EMAIL_ADDRESS
+        """
+        # Remove < and > brackets
+        tag_content = tag.strip("<>")
+        # Split by underscore and remove the last part (which is the counter)
+        parts = tag_content.rsplit("_", 1)
+        # Return everything except the counter
+        return parts[0] if len(parts) > 1 else tag_content
 
 
 class PresidioUtility:
     """Presidio PII detection & anonymization with country-specific support."""
 
-    def __init__(self, chunk_size: int = 100000):
+    def __init__(self, chunk_size: int = 100000, nlp_engine_type: str = None):
         """
         Initialize Presidio utility.
         
@@ -94,10 +114,26 @@ class PresidioUtility:
             chunk_size: Maximum characters per chunk (default: 100,000)
                        Chunks break at natural boundaries (newlines, periods)
                        No overlap needed with smart chunking
+            nlp_engine_type: Type of NLP engine to use (default: from env var NLP_ENGINE_TYPE or "spacy")
+                           Options: "spacy", "transformers", "spacy_small"
         """
         try:
-            # Initialize Presidio with default recognizers
-            self.analyzer = AnalyzerEngine()
+            # Get NLP engine type from parameter or environment variable
+            if nlp_engine_type is None:
+                nlp_engine_type = os.getenv("NLP_ENGINE_TYPE", "spacy")
+            
+            # Initialize NLP engine
+            from utility.nlp_config import get_nlp_engine, get_current_model_info
+            nlp_engine = get_nlp_engine(nlp_engine_type)
+            
+            # Get model info for logging
+            model_info = get_current_model_info(nlp_engine)
+            logger.info(f"NLP Engine: {model_info['engine_type']}")
+            for lang, info in model_info['models'].items():
+                logger.info(f"  Language '{lang}': {info}")
+            
+            # Initialize Presidio with custom NLP engine
+            self.analyzer = AnalyzerEngine(nlp_engine=nlp_engine)
             self.anonymizer = AnonymizerEngine()
             
             # Register custom recognizers programmatically
@@ -289,8 +325,17 @@ class PresidioUtility:
                 # Resolve overlapping entities
                 resolved = self._resolve_overlapping_entities(all_entities)
                 
-                logger.info(f"Detected {len(resolved)} PII entities for country={country} (chunked)")
-                return resolved
+                # Enhance PERSON detection with titles (Mr, Mrs, Ms, Dr, etc.)
+                enhanced = self._enhance_person_with_titles(text, resolved)
+                
+                # Filter ETHNICITY false positives using context analysis
+                context_filtered = self._filter_ethnicity_false_positives(text, enhanced)
+                
+                # Filter out our own anonymization tags
+                filtered = self._filter_anonymization_tags(text, context_filtered)
+                
+                logger.info(f"Detected {len(filtered)} PII entities for country={country} (chunked)")
+                return filtered
             else:
                 # Text is small enough, process normally
                 logger.debug(f"Text length ({len(text):,} chars) within chunk size, processing normally")
@@ -308,8 +353,18 @@ class PresidioUtility:
                 # Filter by score and requested entities only
                 filtered = [e for e in results if e.score >= 0.4 and e.entity_type in entities]
                 resolved = self._resolve_overlapping_entities(filtered)
-                logger.info(f"Detected {len(resolved)} PII entities for country={country}")
-                return resolved
+                
+                # Enhance PERSON detection with titles (Mr, Mrs, Ms, Dr, etc.)
+                enhanced = self._enhance_person_with_titles(text, resolved)
+                
+                # Filter ETHNICITY false positives using context analysis
+                context_filtered = self._filter_ethnicity_false_positives(text, enhanced)
+                
+                # Filter out our own anonymization tags
+                final = self._filter_anonymization_tags(text, context_filtered)
+                
+                logger.info(f"Detected {len(final)} PII entities for country={country}")
+                return final
                 
         except Exception as e:
             raise PresidioException(f"PII detection failed: {e}")
@@ -324,6 +379,18 @@ class PresidioUtility:
     ) -> Dict:
         """Anonymize detected PII with consistent mapping + AES encryption."""
         try:
+            if not entities:
+                return {
+                    "anonymized_text": text,
+                    "mapping": {},
+                    "encryption_key": "",
+                    "entities_count": 0,
+                }
+
+            # CRITICAL: Resolve overlapping entities again before anonymization
+            # This prevents the [E1010] spaCy error about overlapping spans
+            entities = self._resolve_overlapping_entities(entities)
+            
             if not entities:
                 return {
                     "anonymized_text": text,
@@ -369,31 +436,345 @@ class PresidioUtility:
     def _resolve_overlapping_entities(
         entities: List[RecognizerResult],
     ) -> List[RecognizerResult]:
-        """Resolve overlapping entities by prioritizing highest score."""
+        """
+        Resolve overlapping entities by prioritizing highest score.
+        
+        This method ensures NO overlapping entities remain, which prevents
+        the spaCy [E1010] error during anonymization.
+        
+        Strategy:
+        1. Sort by score (highest first)
+        2. Keep entities that don't overlap with already selected ones
+        3. Return sorted by position
+        """
         if not entities:
             return []
         
-        # Sort by position first, then by score (highest first)
-        sorted_ents = sorted(entities, key=lambda x: (x.start, x.end, -x.score))
+        # Sort by score (highest first), then by start position
+        sorted_by_score = sorted(entities, key=lambda x: (-x.score, x.start))
         
         resolved: List[RecognizerResult] = []
-        for ent in sorted_ents:
-            # Check if this entity overlaps with any already resolved entity
-            overlaps = [r for r in resolved if ent.start < r.end and ent.end > r.start]
-            
-            if not overlaps:
-                # No overlap, add it
-                resolved.append(ent)
-            else:
-                # There's overlap - keep the one with higher score
-                for overlap in overlaps:
-                    if ent.score > overlap.score:
-                        # Replace lower score with higher score
-                        resolved.remove(overlap)
-                        resolved.append(ent)
-                        break
         
-        return sorted(resolved, key=lambda x: x.start)
+        for entity in sorted_by_score:
+            # Check if this entity overlaps with any already resolved entity
+            has_overlap = False
+            for resolved_entity in resolved:
+                # Check for ANY overlap
+                if not (entity.end <= resolved_entity.start or entity.start >= resolved_entity.end):
+                    has_overlap = True
+                    break
+            
+            # Only add if no overlap
+            if not has_overlap:
+                resolved.append(entity)
+        
+        # Sort by start position for final output
+        resolved.sort(key=lambda x: x.start)
+        
+        # Log if we removed overlapping entities
+        removed_count = len(entities) - len(resolved)
+        if removed_count > 0:
+            logger.debug(f"Removed {removed_count} overlapping entities (kept highest scores)")
+        
+        return resolved
+    
+    @staticmethod
+    def _filter_anonymization_tags(
+        text: str,
+        entities: List[RecognizerResult]
+    ) -> List[RecognizerResult]:
+        """
+        Filter out entities that are actually our own anonymization tags.
+        
+        This prevents tags like <LOCATION_0> from being detected as PII
+        and masked again (e.g., <LOCATION_0> -> <LOCATION_7>).
+        
+        Args:
+            text: The text being analyzed
+            entities: List of detected entities
+            
+        Returns:
+            Filtered list without tag entities
+        """
+        import re
+        
+        # Pattern to match our anonymization tags: <ENTITY_TYPE_NUMBER>
+        tag_pattern = re.compile(r'<[A-Z_]+_\d+>')
+        
+        filtered = []
+        for entity in entities:
+            # Extract the text for this entity
+            entity_text = text[entity.start:entity.end]
+            
+            # Check if this entity is actually one of our tags
+            if tag_pattern.fullmatch(entity_text):
+                # This is our own tag, skip it
+                logger.debug(f"Filtered out anonymization tag: {entity_text}")
+                continue
+            
+            # Check if this entity is INSIDE a tag
+            # Look at surrounding context to see if it's part of a tag
+            context_start = max(0, entity.start - 1)
+            context_end = min(len(text), entity.end + 1)
+            context = text[context_start:context_end]
+            
+            # If surrounded by < and >, it's part of a tag
+            if context.startswith('<') and context.endswith('>'):
+                logger.debug(f"Filtered out text inside tag: {entity_text}")
+                continue
+            
+            # This is a real entity, keep it
+            filtered.append(entity)
+        
+        removed_count = len(entities) - len(filtered)
+        if removed_count > 0:
+            logger.info(f"Filtered out {removed_count} anonymization tags from detection")
+        
+        return filtered
+    
+    @staticmethod
+    def _filter_ethnicity_false_positives(
+        text: str,
+        entities: List[RecognizerResult]
+    ) -> List[RecognizerResult]:
+        """
+        Filter out ETHNICITY entities that are likely false positives based on context.
+        
+        Common false positives:
+        - "American company" (nationality/origin, not ethnicity)
+        - "Indian food" (cuisine, not ethnicity)
+        - "White paper" (color, not ethnicity)
+        - "Black Friday" (color, not ethnicity)
+        - "German language" (language, not ethnicity)
+        
+        Keep ETHNICITY entities when:
+        - Preceded by ethnicity-related keywords (race, ethnicity, identifies as, etc.)
+        - In demographic/personal information context
+        - Part of a list of ethnicities
+        
+        Args:
+            text: The text being analyzed
+            entities: List of detected entities
+            
+        Returns:
+            Filtered list with ETHNICITY false positives removed
+        """
+        import re
+        
+        # Words that commonly appear with ambiguous ethnicity terms (false positive indicators)
+        false_positive_indicators = [
+            # Business/Organization
+            r'\b(company|corporation|corp|business|firm|organization|org|enterprise|inc|llc)\b',
+            # Food/Cuisine
+            r'\b(food|cuisine|restaurant|dish|recipe|meal|cooking|kitchen)\b',
+            # Language
+            r'\b(language|speaking|speak|speaks|spoken|tongue|dialect)\b',
+            # Geography/Location
+            r'\b(country|nation|state|city|region|area|territory|border)\b',
+            # Products/Goods
+            r'\b(product|goods|item|merchandise|brand|style)\b',
+            # Colors (for White/Black)
+            r'\b(paper|color|colour|paint|shirt|dress|car|house|box|bag)\b',
+            # Events
+            r'\b(friday|monday|tuesday|wednesday|thursday|saturday|sunday|day|week|month)\b',
+            # Nationality/Citizenship (not ethnicity)
+            r'\b(citizen|citizenship|national|nationality|passport|visa)\b',
+        ]
+        
+        # Combine into one pattern
+        false_positive_pattern = re.compile(
+            '|'.join(false_positive_indicators),
+            re.IGNORECASE
+        )
+        
+        # Keywords that indicate TRUE ethnicity context (keep these)
+        true_ethnicity_indicators = [
+            r'\b(race|racial|ethnicity|ethnic|heritage|ancestry|descent|origin|background)\b',
+            r'\b(identifies as|identify as|self-identify|self-identified)\b',
+            r'\b(demographic|demographics|diversity|multicultural|minority|majority)\b',
+            r'\b(african american|asian american|native american|hispanic|latino|latina)\b',
+        ]
+        
+        # Combine into one pattern
+        true_ethnicity_pattern = re.compile(
+            '|'.join(true_ethnicity_indicators),
+            re.IGNORECASE
+        )
+        
+        # Ambiguous terms that need context checking (common false positives)
+        ambiguous_terms = {
+            'american', 'indian', 'white', 'black', 'asian', 'european',
+            'german', 'french', 'italian', 'spanish', 'chinese', 'japanese',
+            'mexican', 'canadian', 'british', 'english', 'irish', 'scottish',
+            'african', 'latin', 'arab', 'arabic', 'jewish', 'native'
+        }
+        
+        filtered = []
+        
+        for entity in entities:
+            # Only filter ETHNICITY entities
+            if entity.entity_type != "ETHNICITY":
+                filtered.append(entity)
+                continue
+            
+            # Extract the entity text
+            entity_text = text[entity.start:entity.end].lower().strip()
+            
+            # If it's not an ambiguous term, keep it (likely a specific ethnicity)
+            if entity_text not in ambiguous_terms:
+                filtered.append(entity)
+                continue
+            
+            # For ambiguous terms, check context (50 chars before and after)
+            context_start = max(0, entity.start - 50)
+            context_end = min(len(text), entity.end + 50)
+            context = text[context_start:context_end]
+            
+            # Check if context indicates TRUE ethnicity
+            if true_ethnicity_pattern.search(context):
+                # Strong indicator this is a real ethnicity reference
+                filtered.append(entity)
+                logger.debug(f"Kept ETHNICITY '{entity_text}' - true ethnicity context found")
+                continue
+            
+            # Check if context indicates FALSE positive
+            if false_positive_pattern.search(context):
+                # Likely a false positive (e.g., "American company", "Indian food")
+                logger.debug(f"Filtered ETHNICITY '{entity_text}' - false positive context: {context[max(0, entity.start - context_start - 20):min(len(context), entity.end - context_start + 20)]}")
+                continue
+            
+            # No strong indicators either way
+            # For ambiguous cases, use a conservative approach:
+            # - Keep if score is very high (>0.8)
+            # - Filter if score is moderate (<0.8)
+            if entity.score >= 0.8:
+                filtered.append(entity)
+                logger.debug(f"Kept ETHNICITY '{entity_text}' - high confidence score: {entity.score:.2f}")
+            else:
+                logger.debug(f"Filtered ETHNICITY '{entity_text}' - ambiguous context, moderate score: {entity.score:.2f}")
+        
+        removed_count = len([e for e in entities if e.entity_type == "ETHNICITY"]) - len([e for e in filtered if e.entity_type == "ETHNICITY"])
+        if removed_count > 0:
+            logger.info(f"Filtered out {removed_count} ETHNICITY false positives using context analysis")
+        
+        return filtered
+    
+    @staticmethod
+    def _enhance_person_with_titles(
+        text: str,
+        entities: List[RecognizerResult]
+    ) -> List[RecognizerResult]:
+        """
+        Enhance PERSON detection by:
+        1. Including titles (Mr, Mrs, Ms, Dr, etc.) before names
+        2. Expanding to include adjacent capitalized words (last names)
+        
+        If a PERSON entity is detected:
+        - Look backward for titles and include them
+        - Look forward for capitalized words (likely last names) and include them
+        
+        Args:
+            text: The text being analyzed
+            entities: List of detected entities
+            
+        Returns:
+            Enhanced list with expanded PERSON entities
+        """
+        import re
+        
+        # Common titles to detect (case-insensitive)
+        titles = [
+            r'\bMr\.?',      # Mr, Mr.
+            r'\bMrs\.?',     # Mrs, Mrs.
+            r'\bMs\.?',      # Ms, Ms.
+            r'\bMiss\.?',    # Miss, Miss.
+            r'\bDr\.?',      # Dr, Dr.
+            r'\bProf\.?',    # Prof, Prof.
+            r'\bSir\.?',     # Sir, Sir.
+            r'\bMadam\.?',   # Madam, Madam.
+            r'\bLady\.?',    # Lady, Lady.
+            r'\bLord\.?',    # Lord, Lord.
+            r'\bRev\.?',     # Rev, Rev.
+            r'\bFr\.?',      # Fr, Fr. (Father)
+            r'\bSr\.?',      # Sr, Sr. (Sister/Senior)
+            r'\bJr\.?',      # Jr, Jr. (Junior)
+            r'\bEsq\.?',     # Esq, Esq. (Esquire)
+        ]
+        
+        # Combine all titles into one pattern
+        title_pattern = re.compile(
+            r'(' + '|'.join(titles) + r')\s+',
+            re.IGNORECASE
+        )
+        
+        # Pattern for capitalized words (potential last names)
+        # Matches: Khan, Smith, O'Brien, McDonald, etc.
+        capitalized_word_pattern = re.compile(
+            r"^[A-Z][a-z]+(?:'[A-Z][a-z]+)?(?:\s+[A-Z][a-z]+)*"
+        )
+        
+        enhanced = []
+        
+        for entity in entities:
+            # Only enhance PERSON entities
+            if entity.entity_type != "PERSON":
+                enhanced.append(entity)
+                continue
+            
+            new_start = entity.start
+            new_end = entity.end
+            
+            # STEP 1: Check if there's a title before this person
+            # Look back up to 10 characters before the entity
+            lookback_start = max(0, entity.start - 10)
+            prefix_text = text[lookback_start:entity.start]
+            
+            # Search for title at the end of prefix
+            title_match = None
+            for match in title_pattern.finditer(prefix_text):
+                # Keep the last match (closest to the person name)
+                title_match = match
+            
+            if title_match:
+                # Calculate the actual position of the title in the original text
+                new_start = lookback_start + title_match.start()
+            
+            # STEP 2: Check if there are capitalized words after this person (last names)
+            # Look forward up to 50 characters after the entity
+            lookahead_end = min(len(text), entity.end + 50)
+            suffix_text = text[entity.end:lookahead_end]
+            
+            # Skip leading whitespace
+            suffix_text_stripped = suffix_text.lstrip()
+            whitespace_len = len(suffix_text) - len(suffix_text_stripped)
+            
+            # Check if next word(s) are capitalized
+            cap_match = capitalized_word_pattern.match(suffix_text_stripped)
+            if cap_match:
+                # Found capitalized word(s) after the person name
+                # Expand entity to include them
+                new_end = entity.end + whitespace_len + cap_match.end()
+            
+            # Create expanded entity if we made any changes
+            if new_start != entity.start or new_end != entity.end:
+                from presidio_analyzer import RecognizerResult
+                expanded_entity = RecognizerResult(
+                    entity_type="PERSON",
+                    start=new_start,
+                    end=new_end,
+                    score=entity.score
+                )
+                
+                expanded_text = text[new_start:new_end]
+                original_text = text[entity.start:entity.end]
+                logger.debug(f"Enhanced PERSON: '{original_text}' → '{expanded_text}'")
+                
+                enhanced.append(expanded_entity)
+            else:
+                # No changes, keep original entity
+                enhanced.append(entity)
+        
+        return enhanced
 
 
 # ============================================================

@@ -1,10 +1,12 @@
 """
 Country-specific PII configuration.
-Maps each supported country to its PII entity types (10 common + country-specific).
+Maps each supported country to its PII entity types (9 common + country-specific).
 All entity detection is handled by Presidio's built-in and custom recognizers.
 
-Common Entities (10): PERSON, EMAIL_ADDRESS, PHONE_NUMBER, LOCATION, AGE, GENDER,
-                      ETHNICITY, IP_ADDRESS, COOKIE, CERTIFICATE_NUMBER
+Common Entities (9): PERSON, EMAIL_ADDRESS, PHONE_NUMBER, AGE, GENDER,
+                     ETHNICITY, IP_ADDRESS, COOKIE, CERTIFICATE_NUMBER
+                     (LOCATION removed - not masking locations)
+                     (ETHNICITY uses context-based filtering to reduce false positives)
 Country-Specific: Varies by country (e.g., US_SSN, ZIP_CODE, CA_SIN, etc.)
 
 Note: Regex patterns and recognition logic are defined in Presidio recognizer classes,
@@ -26,15 +28,17 @@ DEFAULT_COUNTRY = "United States"
 # ============================================================
 # Total: 10 common entities + country-specific entities
 
-# Common entities shared across all countries (10 total)
+# Common entities shared across all countries (9 total)
+# Note: LOCATION removed - not masking location entities
+# Note: ETHNICITY uses context-based filtering to reduce false positives
 _COMMON_ENTITIES = [
     "PERSON",           # Person names
     "EMAIL_ADDRESS",    # Email addresses
     "PHONE_NUMBER",     # Phone numbers
-    "LOCATION",         # Addresses, cities, states
+    # "LOCATION",       # DISABLED - Addresses, cities, states
     "AGE",              # Age mentions
     "GENDER",           # Gender mentions
-    "ETHNICITY",        # Ethnicity/race
+    "ETHNICITY",        # Ethnicity/race (with context-based filtering)
     "IP_ADDRESS",       # IP addresses
     "COOKIE",           # Session IDs, tokens, cookies
     "CERTIFICATE_NUMBER", # Certificates, licenses, policy numbers
@@ -113,7 +117,9 @@ def get_entities_for_country(country: str) -> List[str]:
         country: Country name (e.g., "United States", "Canada")
         
     Returns:
-        List of entity names to detect (10 common + USA + country-specific)
+        List of entity names to detect (9 common + USA + country-specific)
+        Note: LOCATION entity is excluded from detection
+        Note: ETHNICITY uses context-based filtering to reduce false positives
         
     Example:
         >>> get_entities_for_country("Canada")

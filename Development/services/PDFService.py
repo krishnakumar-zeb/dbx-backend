@@ -110,7 +110,7 @@ class PDFService(BaseService):
                     page.add_redact_annot(
                         bbox,
                         text=tag,
-                        fill=(1, 1, 1),  # White background
+                        fill=None,  # No fill - transparent background
                         text_color=(0, 0, 0)  # Black text
                     )
                 
@@ -190,8 +190,14 @@ class PDFService(BaseService):
                         # Extract the original value between current position and common text
                         orig_value = original_text[orig_pos:common_idx]
 
-                        if orig_value.strip():
-                            replacements[orig_value] = tag
+                        # CRITICAL: Only add if value is non-empty and has actual content
+                        if orig_value and orig_value.strip() and len(orig_value.strip()) > 0:
+                            # Additional validation: value should not be just whitespace or newlines
+                            if not orig_value.replace('\n', '').replace('\r', '').replace(' ', '').replace('\t', ''):
+                                # Skip whitespace-only values
+                                pass
+                            else:
+                                replacements[orig_value] = tag
 
                         # Move original position past the common text
                         orig_pos = common_idx
@@ -205,8 +211,13 @@ class PDFService(BaseService):
                 # Tag is at the end, remaining text is the original value
                 if orig_pos < len(original_text):
                     orig_value = original_text[orig_pos:]
-                    if orig_value.strip():
-                        replacements[orig_value] = tag
+                    # CRITICAL: Only add if value is non-empty and has actual content
+                    if orig_value and orig_value.strip() and len(orig_value.strip()) > 0:
+                        if not orig_value.replace('\n', '').replace('\r', '').replace(' ', '').replace('\t', ''):
+                            # Skip whitespace-only values
+                            pass
+                        else:
+                            replacements[orig_value] = tag
                 orig_pos = len(original_text)
 
         return replacements
@@ -215,10 +226,9 @@ class PDFService(BaseService):
         self, text_dict: Dict, replacements: Dict[str, str]
     ) -> List[tuple]:
         """
-        Find bounding boxes for all PII values in the page using text dictionary.
+        Find precise bounding boxes for all PII values in the page.
         
-        This is much faster than search_for() because we traverse the text structure
-        once and match all PII values in a single pass.
+        Uses character-level precision to avoid removing entire lines.
         
         Args:
             text_dict: Page text dictionary from get_text("dict")
@@ -240,49 +250,104 @@ class PDFService(BaseService):
                 for span in line.get("spans", []):
                     text = span.get("text", "")
                     bbox = span.get("bbox")
+                    font_size = span.get("size", 12)
                     
                     if text and bbox:
                         text_spans.append({
                             "text": text,
                             "bbox": fitz.Rect(bbox),
-                            "line_bbox": fitz.Rect(line.get("bbox", bbox))
+                            "font_size": font_size
                         })
         
-        # For each PII value, find matching spans
+        # For each PII value, find matching spans with precise bbox calculation
         for pii_value, tag in replacements.items():
+            # CRITICAL: Validate PII value before processing
             if not pii_value or not pii_value.strip():
                 continue
             
-            # Try to find the PII value in the text spans
-            pii_len = len(pii_value)
+            # Skip if value is only whitespace/newlines
+            cleaned_value = pii_value.replace('\n', '').replace('\r', '').replace(' ', '').replace('\t', '')
+            if not cleaned_value:
+                continue
             
-            # Build continuous text from spans to search
+            pii_len = len(pii_value)
+            found = False  # Track if we found this PII in the PDF
+            
+            # Search through spans
             for i, span in enumerate(text_spans):
                 span_text = span["text"]
                 
-                # Check if PII value starts in this span
+                # Check if PII value is in this span
                 if pii_value in span_text:
-                    # PII is entirely within this span
-                    positions.append((pii_value, tag, span["bbox"]))
+                    # Calculate precise bbox for just the PII text within the span
+                    pii_start_idx = span_text.index(pii_value)
+                    pii_end_idx = pii_start_idx + pii_len
+                    
+                    # Calculate character width (approximate)
+                    span_bbox = span["bbox"]
+                    span_width = span_bbox.width
+                    char_width = span_width / len(span_text) if len(span_text) > 0 else span_width
+                    
+                    # Calculate precise bbox for the PII text only
+                    pii_x0 = span_bbox.x0 + (pii_start_idx * char_width)
+                    pii_x1 = span_bbox.x0 + (pii_end_idx * char_width)
+                    
+                    # Use the same y-coordinates as the span (height)
+                    precise_bbox = fitz.Rect(pii_x0, span_bbox.y0, pii_x1, span_bbox.y1)
+                    
+                    positions.append((pii_value, tag, precise_bbox))
+                    found = True
+                    break  # Found it, move to next PII value
                     
                 elif pii_value.startswith(span_text):
-                    # PII might span multiple spans - try to build it
+                    # PII might span multiple spans - build it carefully
                     combined_text = span_text
-                    combined_bbox = span["bbox"]
+                    span_list = [span]
                     
                     # Look ahead to next spans
                     for j in range(i + 1, min(i + 10, len(text_spans))):
                         next_span = text_spans[j]
                         combined_text += next_span["text"]
-                        combined_bbox = combined_bbox | next_span["bbox"]  # Union of bboxes
+                        span_list.append(next_span)
                         
                         if pii_value in combined_text:
-                            positions.append((pii_value, tag, combined_bbox))
+                            # Found the complete PII across multiple spans
+                            # Calculate minimal bbox that covers only the PII text
+                            
+                            # Start from first span
+                            first_bbox = span_list[0]["bbox"]
+                            last_bbox = span_list[-1]["bbox"]
+                            
+                            # Calculate how much of the last span is used
+                            pii_start_in_combined = combined_text.index(pii_value)
+                            pii_end_in_combined = pii_start_in_combined + pii_len
+                            
+                            # Calculate x0 from first span
+                            first_span_text = span_list[0]["text"]
+                            first_char_width = first_bbox.width / len(first_span_text) if len(first_span_text) > 0 else first_bbox.width
+                            pii_x0 = first_bbox.x0 + (pii_start_in_combined * first_char_width)
+                            
+                            # Calculate x1 from last span
+                            chars_in_last_span = pii_end_in_combined - sum(len(s["text"]) for s in span_list[:-1])
+                            last_span_text = span_list[-1]["text"]
+                            last_char_width = last_bbox.width / len(last_span_text) if len(last_span_text) > 0 else last_bbox.width
+                            pii_x1 = last_bbox.x0 + (chars_in_last_span * last_char_width)
+                            
+                            # Use min/max y-coordinates to cover all spans
+                            pii_y0 = min(s["bbox"].y0 for s in span_list)
+                            pii_y1 = max(s["bbox"].y1 for s in span_list)
+                            
+                            precise_bbox = fitz.Rect(pii_x0, pii_y0, pii_x1, pii_y1)
+                            positions.append((pii_value, tag, precise_bbox))
+                            found = True
                             break
                         
                         if len(combined_text) > pii_len + 10:
                             # Gone too far, stop looking
                             break
+                
+                if found:
+                    break  # Found this PII, move to next one
         
         return positions
  

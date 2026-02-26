@@ -1,6 +1,9 @@
 """
 Custom recognizers for entities not supported by Presidio's default installation.
-These recognizers are imported from the custom Presidio folder and registered programmatically.
+These recognizers are imported from Presidio's predefined_recognizers and registered programmatically.
+
+NOTE: This file only imports recognizers that are actually available in the installed
+Presidio version. Country-specific module structure is not available in this version.
 """
 from typing import List
 from presidio_analyzer import EntityRecognizer
